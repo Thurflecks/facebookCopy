@@ -1,0 +1,27 @@
+{
+  "name": "facebookcopy",
+  "version": "1.0.0",
+  "description": "copia do facebook",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thurflecks/facebookCopy.git"
+  },
+  "author": "Thurflecks github",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Thurflecks/facebookCopy/issues"
+  },
+  "homepage": "https://github.com/Thurflecks/facebookCopy#readme",
+  "dependencies": {
+    "express": "^4.21.0",
+    "express-handlebars": "^8.0.1",
+    "mysql2": "^3.11.3",
+    "sequelize": "^6.37.3"
+  }
+}
