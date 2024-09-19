@@ -1,10 +1,26 @@
-<div class="div-login">
-    <img class="logoFace" src="/icon/facebook.ico" alt=" logo do facebook">
+<script>
+    document.querySelector("body").style.background = "#ecf4fc";
+</script>
+<div class="div-pai">
+    <div>
+        <div class="div-login">
+            <img class="logoFace" src="/imagens/face.png" alt=" logo do facebook">
+        </div>
+        <div class="div-form">
+            <form class="formLogin" action="/login/conta" method="POST">
+                <input class="login" type="email" placeholder="Email" name="email" required>
+                <input class="login" type="password" placeholder="Senha" name="senha" required>
+                <button class="botaoLogin" type="submit">Entrar</button>
+            </form>
+        </div>
+    </div>
+    <div>
+        <div>
+            <a class="nova" href="/criarConta">Criar Nova Conta</a>
+        </div>
+        <div class="div-cred">
+            <p>by Thurflecks</p>
+            <p>Todos os direitos reservados para FACEBOOK</p>
+        </div>
+    </div>
 </div>
-    <form class="formLogin" action="/login/conta" method="POST">
-
-        <input class="login" type="email" placeholder="email" name="email" required>
-        <input class="login" type="password" placeholder="senha" name="senha" required>
-        <button class="botaoLogin" type="submit">Entrar</button>
-    </form>
-    <a class="nova"href="/criarConta">Criar nova contaaa</a>
