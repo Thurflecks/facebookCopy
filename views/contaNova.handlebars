@@ -1,13 +1,32 @@
-<h1 class="titulo">Criar Nova Conta</h1>
-<form class="formContaNova" action="/criarConta/Criando" method="POST">
-    <div class="divContaNova">
-        <input type="text" name="nomeCompleto" id="nomeCompleto" placeholder="Seu Nome Completo" required>
-        <input type="email" name="email" id="email" placeholder="Seu email" required>
-        <input type="password" name="senha" id="senha" placeholder="Nova Senha" required>
-        <label for="dataNasc">Data de Nascimento:</label>
-        <input type="date" name="dataNasc" id="dataNasc" required>
-        <button type="submit">Cadastra-se</button>
-
+<script>
+    document.querySelector("body").style.background = "#ecf4fc";
+</script>
+<div class="divPaiContaNova">
+    <div>
+        <div class="contaimg">
+            <img class="logoFace" src="/imagens/face.png" alt=" logo do facebook">
+        </div>
+        <form class="formContaNova" action="/criarConta/Criando" method="POST">
+            <div class="divContaNova">
+                <h1 class="titulo">Criar Nova Conta:</h1>
+                <input class="login" "text" name="nomeCompleto" id="nomeCompleto" placeholder="Seu Nome Completo"
+                    required>
+                <input class="login" type="email" name="email" id="email" placeholder="Seu email" required>
+                <input class="login" type="password" name="senha" id="senha" placeholder="Nova Senha" required>
+                <label for="dataNasc">Data de Nascimento:</label>
+                <input class="login" type="date" name="dataNasc" id="dataNasc" required>
+                <button class="botaoLogin" type="submit">Cadastra-se</button>
+            </div>
+        </form>
 
     </div>
-</form>
+    <div>
+        <div>
+            <a class="nova" href="/login">Entrar em uma conta existente</a>
+        </div>
+        <div  class="div-fim">
+            <p>by Thurflecks</p>
+            <p>Todos os direitos reservados para FACEBOOK</p>
+        </div>
+    </div>
+</div>

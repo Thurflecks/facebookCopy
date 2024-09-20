@@ -71,3 +71,52 @@
     font-family: Optimistic;
     
 }
+.divContaNova {
+    display: flex;
+    flex-direction: column;
+}
+.formContaNova {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    font-family: Optimistic;
+}
+.formContaNova label{
+    color: black;
+    font-family: Optimistic;
+    font-size: 20px;
+    margin: 20px auto 20px;
+    
+}
+.titulo {
+    color: black;
+    font-size: 20px;
+    margin: 30px;
+}
+.contaimg {
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+    margin-bottom: 90px; 
+}
+.logoFace {
+    height: 60px;
+    width: 60px;
+}
+.div-fim p{
+    color: rgb(99, 120, 138);
+    margin: 10px;
+    
+}
+.div-fim {
+    text-align: center;
+}
+.divPaiContaNova {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100vh;
+    font-family: Optimistic;
+    
+}
