@@ -8,15 +8,32 @@ router.get("/login", (req, res) => {
     res.render("login")
 })
 
-router.post("/login/conta", (req, res) => {
-    res.send("conta logada")
+router.post("/login/conta", async (req, res) => {
+    const { email, senha } = req.body;
+    try {
+        user.findOne({
+            where: { email: email, senha: senha }
+        }).then((usuario) => {
+            req.session.user = {
+                id: usuario.iduser,
+                email: usuario.email,
+            }
+            res.redirect("/")
+        }).catch(erro => {
+            console.log(erro)
+            res.redirect("/login")
+        })
+    } catch (err) {
+        console.log(err)
+        res.redirect("/login")
+    }
 })
 
 router.get("/criarConta", (req, res) => {
     res.render("contaNova")
 })
 
-router.post("/criarConta/criando", async(req, res) => {
+router.post("/criarConta/criando", async (req, res) => {
     const { nomeCompleto, email, senha, dataNasc } = req.body;
     try {
         await user.create({
@@ -27,13 +44,14 @@ router.post("/criarConta/criando", async(req, res) => {
         })
         res.redirect("/")
 
-    }catch(err){
+    } catch (err) {
         console.log(`erro ao criar a conta ${err}`)
+        res.redirect("/criarConta")
     }
 })
-router.get("/", authenticate, async(req, res) =>{
-    post.findAll().then(function(posts){
-        res.render("feed", {posts: posts})
+router.get("/", authenticate, async (req, res) => {
+    post.findAll().then(function (posts) {
+        res.render("feed", { posts: posts })
     })
 })
 
