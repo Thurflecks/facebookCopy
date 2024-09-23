@@ -6,7 +6,7 @@ const sequelize = new Sequelize("facebook", "root", "", {
 })
 
 sequelize.authenticate().then(()=>
-console.log("vasco da gama")
+console.log("banco de dados conectado")
 ).catch((err)=>{
     console.log(`deu erro arromabedi ${err}`)
 })
