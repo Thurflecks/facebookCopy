@@ -1,16 +1,21 @@
+<script>
+    document.querySelector("body").style.background = "#ecf4fc";
+</script>
 <div class="divPaiFeed">
     <div>
         <nav class="navFeed">
             <div>
-                <a href="/" class="tituloface">FACEBOOK</a>
+                <a href="/" class="tituloface">facebookCopy</a>
             </div>
         </nav>
         <nav class="navIcons">
             <div>
                 <a href="/feed"><i class='bx bx-home-alt-2 icons-nav' style='color:#0400ff'></i></a>
-                <a href="/amigos"><i class='bx bxs-user-account bx-flip-horizontal icons-nav' style="color: #000000;" ></i></a>
-                <a href="/notificacoes"><i class='bx bxs-bell bx-flip-horizontal icons-nav' style="color: #000000;"></i></a>
-                <a href="/minhaConta"><i class='bx bxs-user bx-flip-horizontal icons-nav' style="color:#000000" ></i></a>
+                <a href="/amigos"><i class='bx bxs-user-account bx-flip-horizontal icons-nav'
+                        style="color: #000000;"></i></a>
+                <a href="/notificacoes"><i class='bx bxs-bell bx-flip-horizontal icons-nav'
+                        style="color: #000000;"></i></a>
+                <a href="/minhaConta"><i class='bx bxs-user bx-flip-horizontal icons-nav' style="color:#000000"></i></a>
             </div>
         </nav>
     </div>
@@ -19,11 +24,17 @@
             {{#each posts}}
 
             <div class="post">
-                <img src={{this.imagem}} alt="conteudo post">
-                <p>{{this.legenda}}</p>
+                <h1><i class='bx bxs-user bx-flip-horizontal imgPerfil' style="color:#000000"></i>nome do usuario</h1>
+                <img class="imagemPost" src={{this.imagem}} alt="conteudo post">
+                <div class="content-inline">
+                    <h2>nome do usuario</h2>
+                    <p>{{this.legenda}}</p>
+                </div>
             </div>
 
-            {{/each}}
         </div>
+
+        {{/each}}
     </div>
+</div>
 </div>

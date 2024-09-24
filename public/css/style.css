@@ -2,6 +2,11 @@
     font-family: Optimistic;
     src: url("./fonte/optimist-3.otf") format("opentype");
 }
+@font-face{
+    font-family: Helvetica;
+    src: url("./fonte/HelveticaNeueMedium.otf") format("opentype");
+}
+
 .div-login {
     display: flex;
     justify-content: center;
@@ -127,9 +132,46 @@
     margin: 10px;
 }
 
-.tituloFace {
+.tituloface {
+    font-family: Helvetica;
+    color: #1877F2;
+    text-decoration: none;
+    font-size: 20px;
     font-weight: bold;
 }
 .icons-nav {
-    font-size: 40px;
+    font-size: 30px;
+    flex-direction: row;
+    margin:10px 30px 20px;
+}
+.imagemPost{
+    width: 100%;
+}
+.post p{
+    font-family: Helvetica;
+}
+.post {
+    border-top: 2px solid rgb(99, 120, 138);
+}
+.post h1{
+    margin: 15px 0 15px;
+    font-size: 15px;
+    font-family: Helvetica;
+}
+.imgPerfil{
+    font-size: 25px;
+    margin: 0 10px 0;
+}
+.post h2 p{
+    flex-direction: row;
+}
+.content-inline {
+    display: flex;
+    align-items: center;
+    gap: 20px; 
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+.content-inline p h2{
+    margin: 0;
 }
