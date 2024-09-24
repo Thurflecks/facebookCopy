@@ -31,7 +31,7 @@ const user = sequelize.define("user", {
         type: Sequelize.STRING,
         allowNull: true
     },
-    foto_perfil: {
+    foto_capa: {
         type: Sequelize.STRING,
         allowNull: true
     }

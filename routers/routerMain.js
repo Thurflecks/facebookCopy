@@ -1,17 +1,18 @@
 const express = require("express")
 const router = express.Router()
-const post = require("../models/Post")
+const postModel = require("../models/Post")
 const authenticate = require("../midlleware/authenticate")
-const user = require("../models/User");
+const userModel = require("../models/User");
+const verifyLogin = require("../midlleware/verifyLogin")
 
-router.get("/login", (req, res) => {
+router.get("/login", verifyLogin, (req, res) => {
     res.render("login")
 })
 
 router.post("/login/conta", async (req, res) => {
     const { email, senha } = req.body;
     try {
-        user.findOne({
+        await userModel.findOne({
             where: { email: email, senha: senha }
         }).then((usuario) => {
             req.session.user = {
@@ -29,14 +30,14 @@ router.post("/login/conta", async (req, res) => {
     }
 })
 
-router.get("/criarConta", (req, res) => {
+router.get("/criarConta", verifyLogin, (req, res) => {
     res.render("contaNova")
 })
 
 router.post("/criarConta/criando", async (req, res) => {
     const { nomeCompleto, email, senha, dataNasc } = req.body;
     try {
-        await user.create({
+        await userModel.create({
             nome: nomeCompleto,
             email: email,
             senha: senha,
@@ -49,10 +50,29 @@ router.post("/criarConta/criando", async (req, res) => {
         res.redirect("/criarConta")
     }
 })
+router.get("/newPost", authenticate, (req, res) =>{
+    res.render("newPost")
+})
 router.get("/", authenticate, async (req, res) => {
-    post.findAll().then(function (posts) {
-        res.render("feed", { posts: posts })
-    })
+    try {
+        const posts = await postModel.findAll()
+
+        const postsAjeitados = await Promise.all(posts.map(async(post) => {
+            let user = await userModel.findByPk(post.iduser)
+
+            return {
+                ...post.dataValues,
+                username: user.nome.toLowerCase(),
+                foto_perfil: user.foto_perfil
+
+            }
+        }))
+        res.render("feed", {postsAjeitados:postsAjeitados})
+    
+    } catch (err) {
+        res.send("erro corno")
+    }
+
 })
 
 
