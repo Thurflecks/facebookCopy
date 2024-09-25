@@ -41,9 +41,10 @@ router.post("/criarConta/criando", async (req, res) => {
             nome: nomeCompleto,
             email: email,
             senha: senha,
-            data_nascimento: dataNasc
+            data_nascimento: dataNasc,
+            foto_perfil: "https://raw.githubusercontent.com/LudoVicenseStudio/assets/refs/heads/main/Imagens%20figures/Blank%20pfp.jpeg"
         })
-        res.redirect("/")
+        res.redirect("/login")
 
     } catch (err) {
         console.log(`erro ao criar a conta ${err}`)
