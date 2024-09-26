@@ -58,6 +58,7 @@ router.post("/criarConta/criando", async (req, res) => {
     }
 })
 router.get("/newPost", authenticate, (req, res) => {
+    console.log(req.session.id)
     res.render("newPost")
 })
 

@@ -13,7 +13,7 @@ const post = sequelize.define("post", {
     },
     legenda: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
     },
     imagem: {
         type: Sequelize.BLOB,
