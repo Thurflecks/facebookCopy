@@ -5,7 +5,6 @@ const authenticate = require("../midlleware/authenticate")
 const userModel = require("../models/User");
 const verifyLogin = require("../midlleware/verifyLogin");
 const multer = require("multer");
-const user = require("../models/User");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -24,7 +23,6 @@ router.post("/login/conta", async (req, res) => {
                 id: usuario.iduser,
                 email: usuario.email,
             }
-            req.session.iduser = user.id
             res.redirect("/")
         }).catch(erro => {
             console.log(erro)
@@ -58,7 +56,6 @@ router.post("/criarConta/criando", async (req, res) => {
     }
 })
 router.get("/newPost", authenticate, (req, res) => {
-    console.log(req.session.id)
     res.render("newPost")
 })
 
@@ -75,7 +72,7 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
 
     try {
         await postModel.create({
-            iduser: req.session.iduser,
+            iduser: req.session.user.id,
             legenda: legenda,
             imagem: conteudoPost,
             data_criacao: data_criacao
