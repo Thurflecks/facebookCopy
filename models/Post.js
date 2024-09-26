@@ -16,7 +16,7 @@ const post = sequelize.define("post", {
         allowNull: false
     },
     imagem: {
-        type: Sequelize.STRING,
+        type: Sequelize.BLOB,
         allowNull: false
     },
     data_criacao: {
