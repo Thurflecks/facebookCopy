@@ -39,7 +39,7 @@ router.post("/login/conta", async (req, res) => {
             res.redirect("/login")
         })
     } catch (err) {
-        console.log(err)
+        console.log("erro ao fazer o login", err)
         res.redirect("/login")
     }
 })
@@ -91,7 +91,7 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
         res.redirect("/")
 
     } catch (erro) {
-        console.log(erro)
+        res.send("erro ao enviar o post:", erro)
     }
 
 })
@@ -106,7 +106,7 @@ router.get("/minhaConta", authenticate, async (req, res) => {
             where: { iduser: id }
         });
         const postUser = await postModel.findAll({
-            where: { iduser: id }
+            where: { iduser: id }, order: [['idpost', 'DESC']]
         })
         const postsConta = postUser.map(post => {
             const imagemBase64 = post.imagem ? post.imagem.toString('base64') : null;
@@ -138,7 +138,7 @@ router.get("/minhaConta/editarPerfil", authenticate, async (req, res) => {
         });
         
     } catch (err) {
-        console.log("deu erro aqui: ", err)
+        console.log("erro ao exibir o editar da conta: ", err)
     }
 })
 
@@ -157,7 +157,7 @@ router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, 
         await userModel.update(atualizacoes, { where: { iduser: id } });
         res.redirect("/minhaConta");
     }catch(err){
-        console.log("deu erro na atulizando do perfil:", err)
+        res.send("deu erro atualizando o perfil:", err)
     }
 })
 
@@ -179,7 +179,7 @@ router.get("/amigos", authenticate, async (req, res) => {
 })
 router.get("/", authenticate, async (req, res) => {
     try {
-        const posts = await postModel.findAll();
+        const posts = await postModel.findAll({order: [['idpost', 'DESC']]});
 
         const postsAjeitados = await Promise.all(posts.map(async (post) => {
             let user = await userModel.findByPk(post.iduser);
@@ -200,7 +200,7 @@ router.get("/", authenticate, async (req, res) => {
         res.render("feed", { postsAjeitados: postsAjeitados, fotoPerfil });
     } catch (err) {
         console.log(err)
-        res.send("erro corno");
+        res.send("erro ao exibir o feed:", err);
     }
 });
 

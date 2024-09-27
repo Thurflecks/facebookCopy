@@ -30,7 +30,7 @@
             <form action="/minhaConta/editarPerfil/atualizando" class="formAtualizarPerfil" enctype="multipart/form-data" method="post">
                 <div class="divFormAtt">
                     <label for="text">NOME:</label>
-                    <input type="text" class="formAtt" name="nomeAtt" value='{{{usuarioConta.nome}}}'>
+                    <input type="text" class="formAtt" name="nomeAtt" value='{{{usuarioConta.nome}}}' required>
                     <label for="text">BIO:</label>
                     <textarea type="text" class="formAtt bioatt" name="bioAtt">{{{usuarioConta.bio}}}</textarea>
                     <label for="text">FOTO DE PERFIL:</label>
