@@ -10,9 +10,13 @@ const upload = multer({ storage: storage });
 const path = require("path")
 const fs = require("fs");
 const user = require("../models/User");
+const { where } = require("sequelize");
 
 const imagemPost = upload.fields([
     { name: 'conteudoPost', maxCount: 1 },
+]);
+const imagemPerfil = upload.fields([
+    { name: 'fotoPerfilAtt', maxCount: 1 },
 ]);
 
 router.get("/login", verifyLogin, (req, res) => {
@@ -20,8 +24,8 @@ router.get("/login", verifyLogin, (req, res) => {
 })
 
 router.post("/login/conta", async (req, res) => {
-    const { email, senha } = req.body;
     try {
+        const { email, senha } = req.body;
         await userModel.findOne({
             where: { email: email, senha: senha }
         }).then((usuario) => {
@@ -45,10 +49,10 @@ router.get("/criarConta", verifyLogin, (req, res) => {
 })
 
 router.post("/criarConta/criando", async (req, res) => {
-    const imagePath = '/home/two/Documentos/facebookCopy/public/imagens/default.jpeg';
-    const defaultImage = fs.readFileSync(imagePath);
-    const { nomeCompleto, email, senha, dataNasc } = req.body;
     try {
+        const imagePath = '/home/two/Documentos/facebookCopy/public/imagens/default.jpeg';
+        const defaultImage = fs.readFileSync(imagePath);
+        const { nomeCompleto, email, senha, dataNasc } = req.body;
         await userModel.create({
             nome: nomeCompleto,
             email: email,
@@ -96,13 +100,13 @@ router.get("/minhaConta", authenticate, async (req, res) => {
         const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
             return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
         })
-        const id = req.session.user.id 
+        const id = req.session.user.id
 
         const usuario = await userModel.findOne({
-            where: { iduser: id}
+            where: { iduser: id }
         });
         const postUser = await postModel.findAll({
-            where: { iduser: id}
+            where: { iduser: id }
         })
         const postsConta = postUser.map(post => {
             const imagemBase64 = post.imagem ? post.imagem.toString('base64') : null;
@@ -116,12 +120,46 @@ router.get("/minhaConta", authenticate, async (req, res) => {
         });
 
 
-        res.render("minhaConta", { fotoPerfil, usuario, postsConta});
+        res.render("minhaConta", { fotoPerfil, usuario, postsConta });
     } catch (err) {
         console.log("Erro ao carregar a conta:", err);
         res.send("Erro ao carregar a conta.");
     }
 });
+
+router.get("/minhaConta/editarPerfil", authenticate, async (req, res) => {
+    try {
+        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+        })
+        await userModel.findByPk(req.session.user.id).then(function(conta) {
+
+            res.render("editarPerfil", { fotoPerfil, usuarioConta : conta });
+        });
+        
+    } catch (err) {
+        console.log("deu erro aqui: ", err)
+    }
+})
+
+router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, async(req, res) => {
+    try{
+        const fotoPerfilAtt = req.files['fotoPerfilAtt'] ? req.files['fotoPerfilAtt'][0].buffer : null
+        const { nomeAtt, bioAtt } = req.body;
+        const id = req.session.user.id
+        const atualizacoes = {
+            nome: nomeAtt,
+            bio: bioAtt
+        };
+        if (fotoPerfilAtt) {
+            atualizacoes.foto_perfil = fotoPerfilAtt;
+        }
+        await userModel.update(atualizacoes, { where: { iduser: id } });
+        res.redirect("/minhaConta");
+    }catch(err){
+        console.log("deu erro na atulizando do perfil:", err)
+    }
+})
 
 router.get("/notificacoes", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {

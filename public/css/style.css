@@ -184,10 +184,6 @@
     font-weight: bold;
 }
 
-.nomeperfil p {
-    text-transform: capitalize;
-}
-
 .imgPerfil {
     font-size: 25px;
     margin: 0 10px 0;
@@ -301,4 +297,33 @@
 }
 .minhacontaAtivate{
     border: 2px solid #046cdc;
+}
+.divFormAtt{
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex-direction: column;
+    font-family: Optimistic;
+}
+.formAtt{
+    padding: 22px 16px;
+    background: rgb(255, 255, 255);
+    border: 1px solid rgb(203, 210, 217);
+    margin: 5px 10px 5px;
+    border-radius: 12px;
+    width: 95%;
+    font-size: 16px;
+}
+.bioatt{
+    height: 100px;
+}
+.attPerfil{
+    margin-top:30px ;
+}
+.inputPerfil{
+    border: none;
+}
+.divFormAtt label{
+    font-weight: bold;
+    margin: 5px;
 }
