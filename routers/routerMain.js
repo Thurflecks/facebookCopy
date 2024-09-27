@@ -8,7 +8,12 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const path = require("path")
-const fs = require("fs")
+const fs = require("fs");
+const user = require("../models/User");
+
+const imagemPost = upload.fields([
+    { name: 'conteudoPost', maxCount: 1 },
+]);
 
 router.get("/login", verifyLogin, (req, res) => {
     res.render("login")
@@ -66,17 +71,12 @@ router.get("/newPost", authenticate, async (req, res) => {
     res.render("newPost", { fotoPerfil })
 })
 
-const imagemPost = upload.fields([
-    { name: 'conteudoPost', maxCount: 1 },
-]);
-
-
 router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
-    const conteudoPost = req.files['conteudoPost'] ? req.files['conteudoPost'][0].buffer : null
-    const agora = new Date();
-    const data_criacao = agora.toISOString().slice(0, 10);
-    const { legenda } = req.body;
     try {
+        const conteudoPost = req.files['conteudoPost'] ? req.files['conteudoPost'][0].buffer : null
+        const agora = new Date();
+        const data_criacao = agora.toISOString().slice(0, 10);
+        const { legenda } = req.body;
         await postModel.create({
             iduser: req.session.user.id,
             legenda: legenda,
@@ -90,7 +90,54 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
         console.log(erro)
     }
 
+})
+router.get("/minhaConta", authenticate, async (req, res) => {
+    try {
+        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+        })
+        const id = req.session.user.id 
 
+        const usuario = await userModel.findOne({
+            where: { iduser: id}
+        });
+        const postUser = await postModel.findAll({
+            where: { iduser: id}
+        })
+        const postsConta = postUser.map(post => {
+            const imagemBase64 = post.imagem ? post.imagem.toString('base64') : null;
+            let fotoPerfilBase64 = usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null;
+            return {
+                ...post.dataValues,
+                username: usuario.nome.toLowerCase(),
+                foto_perfil: fotoPerfilBase64,
+                imagem: imagemBase64
+            };
+        });
+
+
+        res.render("minhaConta", { fotoPerfil, usuario, postsConta});
+    } catch (err) {
+        console.log("Erro ao carregar a conta:", err);
+        res.send("Erro ao carregar a conta.");
+    }
+});
+
+router.get("/notificacoes", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
+
+    res.render("notificacoes", { fotoPerfil })
+})
+
+
+router.get("/amigos", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
+
+    res.render("amigos", { fotoPerfil })
 })
 router.get("/", authenticate, async (req, res) => {
     try {
