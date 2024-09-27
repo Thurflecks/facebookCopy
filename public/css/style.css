@@ -192,7 +192,13 @@
     border-radius: 50%;
 }
 .navIcons div a{
-    color:rgb(99, 120, 138)
+    color:rgb(99, 120, 138);
+    font-size: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-decoration: none;
+    
 }
 .pageActive{
     color: #1877F2;
@@ -212,4 +218,9 @@
 .legendaPost {
     margin: 20px;
     font-family:Helvetica;
+}
+.minhaContaNav{
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
 }

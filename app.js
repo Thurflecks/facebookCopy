@@ -4,7 +4,6 @@ const app = express()
 const router = require("./routers/routerMain.js")
 const { engine } = require("express-handlebars")
 const session = require("express-session")
-const multer = require("multer")
 //porta
 const port = 8081
 
@@ -34,5 +33,5 @@ app.use(router)
 
 //escutando porta
 app.listen(port, () =>{
-    console.log("funcionando burro")
+    console.log("site online")
 })

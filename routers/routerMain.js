@@ -7,9 +7,10 @@ const verifyLogin = require("../midlleware/verifyLogin");
 const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const path = require("path")
+const fs = require("fs")
 
 router.get("/login", verifyLogin, (req, res) => {
-    console.log(req.session.user)
     res.render("login")
 })
 
@@ -39,6 +40,8 @@ router.get("/criarConta", verifyLogin, (req, res) => {
 })
 
 router.post("/criarConta/criando", async (req, res) => {
+    const imagePath = '/home/two/Documentos/facebookCopy/public/imagens/default.jpeg';
+    const defaultImage = fs.readFileSync(imagePath);
     const { nomeCompleto, email, senha, dataNasc } = req.body;
     try {
         await userModel.create({
@@ -46,7 +49,8 @@ router.post("/criarConta/criando", async (req, res) => {
             email: email,
             senha: senha,
             data_nascimento: dataNasc,
-            foto_perfil: "https://raw.githubusercontent.com/LudoVicenseStudio/assets/refs/heads/main/Imagens%20figures/Blank%20pfp.jpeg"
+            foto_perfil: defaultImage
+
         })
         res.redirect("/login")
 
@@ -55,8 +59,11 @@ router.post("/criarConta/criando", async (req, res) => {
         res.redirect("/criarConta")
     }
 })
-router.get("/newPost", authenticate, (req, res) => {
-    res.render("newPost")
+router.get("/newPost", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
+    res.render("newPost", { fotoPerfil })
 })
 
 const imagemPost = upload.fields([
@@ -69,7 +76,6 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
     const agora = new Date();
     const data_criacao = agora.toISOString().slice(0, 10);
     const { legenda } = req.body;
-
     try {
         await postModel.create({
             iduser: req.session.user.id,
@@ -93,17 +99,22 @@ router.get("/", authenticate, async (req, res) => {
         const postsAjeitados = await Promise.all(posts.map(async (post) => {
             let user = await userModel.findByPk(post.iduser);
             const imagemBase64 = post.imagem ? post.imagem.toString('base64') : null;
+            let fotoPerfilBase64 = user.foto_perfil ? Buffer.from(user.foto_perfil).toString('base64') : null;
 
             return {
                 ...post.dataValues,
                 username: user.nome.toLowerCase(),
-                foto_perfil: user.foto_perfil,
+                foto_perfil: fotoPerfilBase64,
                 imagem: imagemBase64
             };
         }));
+        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+        })
 
-        res.render("feed", { postsAjeitados: postsAjeitados });
+        res.render("feed", { postsAjeitados: postsAjeitados, fotoPerfil });
     } catch (err) {
+        console.log(err)
         res.send("erro corno");
     }
 });
