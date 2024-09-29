@@ -168,6 +168,44 @@ router.get("/notificacoes", authenticate, async (req, res) => {
 
     res.render("notificacoes", { fotoPerfil })
 })
+router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
+    try {
+        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+        })
+        const idpost = req.params.idpost;
+        
+        const post = await postModel.findOne({
+            where: { idpost: idpost }
+        });
+        const userid = post.iduser;
+        
+        const usuario = await userModel.findOne({
+            where: { iduser: userid }
+        });
+        const fotoPerfilBase64 = usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null;
+
+        const postUser = await postModel.findAll({
+            where: { iduser: userid },
+            order: [['idpost', 'DESC']]
+        });
+
+        const postsConta = postUser.map(post => {
+            const imagemBase64 = post.imagem ? Buffer.from(post.imagem).toString('base64') : null;
+            return {
+                ...post.dataValues,
+                username: usuario.nome.toLowerCase(),
+                foto_perfil: fotoPerfilBase64,
+                imagem: imagemBase64
+            };
+        });
+
+        res.render("perfilPosts", { fotoPerfilBase64, usuario, postsConta, fotoPerfil });
+    } catch (erro) {
+        console.log("Erro ao carregar a conta:", erro);
+        res.send("Erro ao carregar a conta");
+    }
+});
 
 
 router.get("/amigos", authenticate, async (req, res) => {
@@ -177,6 +215,8 @@ router.get("/amigos", authenticate, async (req, res) => {
 
     res.render("amigos", { fotoPerfil })
 })
+
+
 router.get("/", authenticate, async (req, res) => {
     try {
         const posts = await postModel.findAll({order: [['idpost', 'DESC']]});
@@ -198,9 +238,9 @@ router.get("/", authenticate, async (req, res) => {
         })
 
         res.render("feed", { postsAjeitados: postsAjeitados, fotoPerfil });
-    } catch (err) {
-        console.log(err)
-        res.send("erro ao exibir o feed:", err);
+    } catch (erro) {
+        console.log(erro)
+        res.send("erro ao exibir o feed:", erro);
     }
 });
 
