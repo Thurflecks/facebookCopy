@@ -174,14 +174,11 @@
 }
 
 .post a {
-    margin: 15px 0 15px;
+    margin: 11px 0 11px;
     font-family: Helvetica;
-    font-size: 15px;
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: black;
-    font-weight: bold;
 }
 
 .imgPerfil {
@@ -326,4 +323,52 @@
 .divFormAtt label{
     font-weight: bold;
     margin: 5px;
+}
+.post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nomeperfil {
+    display: flex;
+    align-items: center;
+    color: black;
+}
+.nomeperfil p{
+    font-weight: bold;
+    font-size: 15px;
+}
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-btn, .delete-btn {
+    font-family: Helvetica;
+    padding: 6px 12px;
+    font-size: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    padding-top: 7px;
+}
+
+.edit-btn {
+    background-color:  rgb(229, 233, 238);
+    color: #046cdc;
+}
+
+.delete-btn {
+    background-color: rgb(229, 233, 238);
+    color: rgb(196, 23, 23);
+}
+
+.edit-btn:hover, .delete-btn:hover {
+    opacity: 0.85;
+}
+#text-legenda{
+    text-align: center;
 }

@@ -132,18 +132,18 @@ router.get("/minhaConta/editarPerfil", authenticate, async (req, res) => {
         const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
             return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
         })
-        await userModel.findByPk(req.session.user.id).then(function(conta) {
+        await userModel.findByPk(req.session.user.id).then(function (conta) {
 
-            res.render("editarPerfil", { fotoPerfil, usuarioConta : conta });
+            res.render("editarPerfil", { fotoPerfil, usuarioConta: conta });
         });
-        
+
     } catch (err) {
         console.log("erro ao exibir o editar da conta: ", err)
     }
 })
 
-router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, async(req, res) => {
-    try{
+router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, async (req, res) => {
+    try {
         const fotoPerfilAtt = req.files['fotoPerfilAtt'] ? req.files['fotoPerfilAtt'][0].buffer : null
         const { nomeAtt, bioAtt } = req.body;
         const id = req.session.user.id
@@ -156,8 +156,9 @@ router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, 
         }
         await userModel.update(atualizacoes, { where: { iduser: id } });
         res.redirect("/minhaConta");
-    }catch(err){
-        res.send("deu erro atualizando o perfil:", err)
+    } catch (err) {
+        console.log(err)
+        res.send("deu erro atualizando o perfil")
     }
 })
 
@@ -174,12 +175,15 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
             return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
         })
         const idpost = req.params.idpost;
-        
+
         const post = await postModel.findOne({
             where: { idpost: idpost }
         });
         const userid = post.iduser;
-        
+        if (userid === req.session.user.id) {
+            res.redirect("/minhaConta")
+        }
+
         const usuario = await userModel.findOne({
             where: { iduser: userid }
         });
@@ -207,7 +211,33 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
     }
 });
 
+router.get("/editPost/:idpost", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
+    await postModel.findByPk(req.params.idpost).then(post => {
+        res.render("editPost", { fotoPerfil, post: post });
+    });
 
+})
+router.post("/post/delete/:id", authenticate, async (req, res) => {
+    id = req.params.id
+    await postModel.destroy({ where: { idpost: id } })
+    res.redirect("/minhaConta")
+})
+router.post("/editPost/salvando/:id", authenticate, async (req, res) => {
+    try {
+        let {legendaNova}  = req.body;
+        const id = req.params.id;
+        await postModel.update(
+            { legenda: legendaNova },
+            { where: { idpost: id } }
+        );
+        res.redirect("/minhaConta")
+    } catch (err) {
+        console.log(err)
+    }
+})
 router.get("/amigos", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
@@ -219,7 +249,7 @@ router.get("/amigos", authenticate, async (req, res) => {
 
 router.get("/", authenticate, async (req, res) => {
     try {
-        const posts = await postModel.findAll({order: [['idpost', 'DESC']]});
+        const posts = await postModel.findAll({ order: [['idpost', 'DESC']] });
 
         const postsAjeitados = await Promise.all(posts.map(async (post) => {
             let user = await userModel.findByPk(post.iduser);

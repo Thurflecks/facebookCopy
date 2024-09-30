@@ -38,10 +38,20 @@
         {{#each postsConta}}
 
         <div class="post">
-            <a href="/Conta/{{iduser}}" class="nomeperfil"><img class="fotoPerfil"
-                    src="data:image/png;base64,{{foto_perfil}}" alt="fot perfil">
-                <p>{{username}}</p>
-            </a>
+            <div class="post-header">
+                <a href="/Conta/{{iduser}}" class="nomeperfil">
+                    <img class="fotoPerfil" src="data:image/png;base64,{{foto_perfil}}" alt="foto perfil">
+                    <p>{{username}}</p>
+                </a>
+
+                <div class="post-actions">
+                    <a href="/editPost/{{idpost}}" class="edit-btn">Editar</a>
+                    <form action="/post/delete/{{idpost}}" method="POST"
+                        onsubmit="return confirm('Tem certeza que deseja deletar este post?');">
+                        <button type="submit" class="delete-btn">Deletar</button>
+                    </form>
+                </div>
+            </div>
             <img class="imagemPost" src="data:image/png;base64,{{imagem}}" alt="conteudo post">
             <div class="content-inline">
                 <h2>{{username}}</h2>
