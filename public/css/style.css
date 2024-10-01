@@ -8,6 +8,13 @@
     src: url("./fonte/HelveticaNeueMedium.otf") format("opentype");
 }
 
+body {
+    display: flex;
+    max-width: 430px;
+    margin: 0 auto;
+    position: relative;
+}
+
 .div-login {
     display: flex;
     justify-content: center;
