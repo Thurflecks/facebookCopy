@@ -43,6 +43,15 @@ router.post("/login/conta", async (req, res) => {
         res.redirect("/login")
     }
 })
+router.post("/logout", (req, res) => {
+    try {
+        req.session.destroy()
+        res.clearCookie("connect.sid")
+        res.redirect("/login")
+    }catch(err){
+        console.log("erro ao sair da conta", err)
+    }
+})
 
 router.get("/criarConta", verifyLogin, (req, res) => {
     res.render("contaNova")
@@ -227,7 +236,7 @@ router.post("/post/delete/:id", authenticate, async (req, res) => {
 })
 router.post("/editPost/salvando/:id", authenticate, async (req, res) => {
     try {
-        let {legendaNova}  = req.body;
+        let { legendaNova } = req.body;
         const id = req.params.id;
         await postModel.update(
             { legenda: legendaNova },

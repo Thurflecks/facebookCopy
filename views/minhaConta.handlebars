@@ -27,6 +27,9 @@
             </div>
         </nav>
         <div class="dadosConta">
+            <form class="logout" action="/logout" method="POST">
+                <button type="submit">logout</button>
+            </form>
             <img class="fotoPerfilLogada" src="data:image/png;base64,{{fotoPerfil}}" alt="fot perfil">
             <p class="nomeContaLogada" name="nomeContaLogada">{{usuario.nome}}</p>
             <label for="" name="bioContaLogada" id="bioContaLogada">{{usuario.bio}}</label>
