@@ -23,6 +23,10 @@ const post = sequelize.define("post", {
         type: Sequelize.DATE,
         allowNull: false
     },
+    likes: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    },
 }, {
     tableName: 'post',
     timestamps: false

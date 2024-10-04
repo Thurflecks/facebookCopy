@@ -39,29 +39,34 @@
     </div>
     <div>
         {{#each postsConta}}
-
-        <div class="post">
-            <div class="post-header">
-                <a href="/Conta/{{iduser}}" class="nomeperfil">
-                    <img class="fotoPerfil" src="data:image/png;base64,{{foto_perfil}}" alt="foto perfil">
-                    <p>{{username}}</p>
-                </a>
-
-                <div class="post-actions">
-                    <a href="/editPost/{{idpost}}" class="edit-btn">Editar</a>
-                    <form action="/post/delete/{{idpost}}" method="POST"
-                        onsubmit="return confirm('Tem certeza que deseja deletar este post?');">
-                        <button type="submit" class="delete-btn">Deletar</button>
-                    </form>
-                </div>
-            </div>
-            <img class="imagemPost" src="data:image/png;base64,{{imagem}}" alt="conteudo post">
-            <div class="content-inline">
-                <h2>{{username}}</h2>
-                <p>{{legenda}}</p>
+    <div class="post">
+        <div class="post-header">
+            <a href="#" class="nomeperfil">
+                <img class="fotoPerfil" src="data:image/png;base64,{{foto_perfil}}" alt="foto perfil">
+                <p>{{username}}</p>
+            </a>
+            <div class="post-actions">
+                <a href="/editPost/{{idpost}}" class="edit-btn">Editar</a>
+                <form action="/post/delete/{{idpost}}" method="POST"
+                    onsubmit="return confirm('Tem certeza que deseja deletar este post?');">
+                    <button type="submit" class="delete-btn">Deletar</button>
+                </form>
             </div>
         </div>
-        {{/each}}
+        <img class="imagemPost" src="data:image/png;base64,{{imagem}}" alt="conteudo post">
+        <div class="div-actions">
+            <form action="/enviarCurtida/{{idpost}}" class="likes" method="post">
+                <button ><i class='bx bx-heart btn-actions like-button {{#if isLiked}}liked bxs-heart{{/if}}'></i></button>
+            </form>
+            <span>{{likes}}</span>
+        </div>
+        <div class="content-inline">
+            <h2>{{username}}</h2>
+            <p>{{legenda}}</p>
+        </div>
+    </div>
+{{/each}}
+
     </div>
     <div>
         <div class="div-fim">

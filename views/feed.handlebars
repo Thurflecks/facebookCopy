@@ -22,18 +22,25 @@
                             stroke-width="2" x1="12.003" x2="12.003" y1="6.545" y2="17.455"></line>
                     </svg></a>
                 <a href="/notificacoes"><i class='bx bx-bell'></i></a>
-                <a href="/minhaConta"><img class="minhaContaNav" src="data:image/png;base64,{{fotoPerfil}}" alt="fot perfil"></a>
+                <a href="/minhaConta"><img class="minhaContaNav" src="data:image/png;base64,{{fotoPerfil}}"
+                        alt="fot perfil"></a>
             </div>
         </nav>
         <div>
             {{#each postsAjeitados}}
 
             <div class="post">
-                <a href="/perfilPosts/{{idpost}}" class="nomeperfil"><img class="fotoPerfil" src="data:image/png;base64,{{foto_perfil}}"
-                        alt="fot perfil">
+                <a href="/perfilPosts/{{idpost}}" class="nomeperfil"><img class="fotoPerfil"
+                        src="data:image/png;base64,{{foto_perfil}}" alt="fot perfil">
                     <p>{{username}}</p>
                 </a>
                 <img class="imagemPost" src="data:image/png;base64,{{imagem}}" alt="conteudo post">
+                <div class="div-actions">
+                    <form action="/enviarCurtida/{{idpost}}" class="likes" method="post">
+                        <button><i class='bx bx-heart btn-actions like-button {{#if isLiked}}liked bxs-heart{{/if}}'></i></button>
+                    </form>
+                    <span>{{likes}}</span>
+                </div>
                 <div class="content-inline">
                     <h2>{{username}}</h2>
                     <p>{{legenda}}</p>

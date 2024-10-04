@@ -11,6 +11,10 @@ const path = require("path")
 const fs = require("fs");
 const user = require("../models/User");
 const { where } = require("sequelize");
+const { styleText } = require("util");
+const { AsyncLocalStorage } = require("async_hooks");
+const likeModel = require("../models/Likes");
+const post = require("../models/Post");
 
 const imagemPost = upload.fields([
     { name: 'conteudoPost', maxCount: 1 },
@@ -36,11 +40,11 @@ router.post("/login/conta", async (req, res) => {
             res.redirect("/")
         }).catch(erro => {
             console.log(erro)
-            res.redirect("/login")
+            res.render("login", { alerta: "<span class='alerta'>Usuário ou senha incorreto!</span>" })
         })
     } catch (err) {
         console.log("erro ao fazer o login", err)
-        res.redirect("/login")
+        res.render("login", { alerta: "<span class='alerta'>Usuário ou senha incorreto!</span>" })
     }
 })
 router.post("/logout", (req, res) => {
@@ -48,7 +52,7 @@ router.post("/logout", (req, res) => {
         req.session.destroy()
         res.clearCookie("connect.sid")
         res.redirect("/login")
-    }catch(err){
+    } catch (err) {
         console.log("erro ao sair da conta", err)
     }
 })
@@ -94,7 +98,8 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
             iduser: req.session.user.id,
             legenda: legenda,
             imagem: conteudoPost,
-            data_criacao: data_criacao
+            data_criacao: data_criacao,
+            likes: 0
 
         })
         res.redirect("/")
@@ -108,26 +113,37 @@ router.get("/minhaConta", authenticate, async (req, res) => {
     try {
         const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
             return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-        })
-        const id = req.session.user.id
+        });
 
+        const id = req.session.user.id;
+        
         const usuario = await userModel.findOne({
             where: { iduser: id }
         });
+
         const postUser = await postModel.findAll({
-            where: { iduser: id }, order: [['idpost', 'DESC']]
-        })
+            where: { iduser: id },
+            order: [['idpost', 'DESC']]
+        });
+
+        const likedPosts = await likeModel.findAll({
+            where: { iduser: id }
+        });
+        const likedPostIds = likedPosts.map(like => like.idpost);
+
         const postsConta = postUser.map(post => {
             const imagemBase64 = post.imagem ? post.imagem.toString('base64') : null;
             let fotoPerfilBase64 = usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null;
+            const isLiked = likedPostIds.includes(post.idpost);
+
             return {
                 ...post.dataValues,
                 username: usuario.nome.toLowerCase(),
                 foto_perfil: fotoPerfilBase64,
-                imagem: imagemBase64
+                imagem: imagemBase64,
+                isLiked
             };
         });
-
 
         res.render("minhaConta", { fotoPerfil, usuario, postsConta });
     } catch (err) {
@@ -171,6 +187,47 @@ router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, 
     }
 })
 
+router.post("/enviarCurtida/:idpost", authenticate, async (req, res) => {
+    const id = req.params.idpost
+    const post = await postModel.findOne({ where: { idpost: id } });
+    try {
+        const existingLike = await likeModel.findOne({
+            where: {
+                idpost: id,
+                iduser: req.session.user.id
+            }
+        })
+        if (existingLike) {
+            await likeModel.destroy({
+                where: {
+                    idpost: id,
+                    iduser: req.session.user.id
+                }
+            });
+            await postModel.update({
+                likes: post.likes -= 1
+            }, {
+                where: { idpost: id }
+            })
+            res.redirect(req.get('Referer'))
+        } else {
+            await likeModel.create({
+                idpost: id,
+                iduser: req.session.user.id
+            })
+
+            await postModel.update({
+                likes: post.likes += 1
+            }, {
+                where: { idpost: id }
+            })
+            res.redirect(req.get('Referer'))
+        }
+    } catch (err) {
+        console.log("erro ao curtir a postagem", err)
+    }
+})
+
 router.get("/notificacoes", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
@@ -182,7 +239,7 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
     try {
         const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
             return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-        })
+        });
         const idpost = req.params.idpost;
 
         const post = await postModel.findOne({
@@ -190,7 +247,7 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
         });
         const userid = post.iduser;
         if (userid === req.session.user.id) {
-            res.redirect("/minhaConta")
+            res.redirect("/minhaConta");
         }
 
         const usuario = await userModel.findOne({
@@ -202,6 +259,13 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
             where: { iduser: userid },
             order: [['idpost', 'DESC']]
         });
+        const liked = await likeModel.findOne({
+            where: {
+                idpost: post.idpost,
+                iduser: req.session.user.id
+            }
+        });
+
 
         const postsConta = postUser.map(post => {
             const imagemBase64 = post.imagem ? Buffer.from(post.imagem).toString('base64') : null;
@@ -209,16 +273,19 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
                 ...post.dataValues,
                 username: usuario.nome.toLowerCase(),
                 foto_perfil: fotoPerfilBase64,
-                imagem: imagemBase64
+                imagem: imagemBase64,
+                isLiked: !!liked
             };
         });
 
         res.render("perfilPosts", { fotoPerfilBase64, usuario, postsConta, fotoPerfil });
     } catch (erro) {
-        console.log("Erro ao carregar a conta:", erro);
+        console.log(erro);
         res.send("Erro ao carregar a conta");
     }
 });
+
+
 
 router.get("/editPost/:idpost", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
@@ -232,6 +299,7 @@ router.get("/editPost/:idpost", authenticate, async (req, res) => {
 router.post("/post/delete/:id", authenticate, async (req, res) => {
     id = req.params.id
     await postModel.destroy({ where: { idpost: id } })
+    await likeModel.destroy({where: {idpost: id} })
     res.redirect("/minhaConta")
 })
 router.post("/editPost/salvando/:id", authenticate, async (req, res) => {
@@ -265,20 +333,29 @@ router.get("/", authenticate, async (req, res) => {
             const imagemBase64 = post.imagem ? post.imagem.toString('base64') : null;
             let fotoPerfilBase64 = user.foto_perfil ? Buffer.from(user.foto_perfil).toString('base64') : null;
 
+            const liked = await likeModel.findOne({
+                where: {
+                    idpost: post.idpost,
+                    iduser: req.session.user.id
+                }
+            });
+
             return {
                 ...post.dataValues,
                 username: user.nome.toLowerCase(),
                 foto_perfil: fotoPerfilBase64,
-                imagem: imagemBase64
+                imagem: imagemBase64,
+                isLiked: !!liked
             };
         }));
+
         const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
             return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-        })
+        });
 
-        res.render("feed", { postsAjeitados: postsAjeitados, fotoPerfil });
+        res.render("feed", { postsAjeitados, fotoPerfil });
     } catch (erro) {
-        console.log(erro)
+        console.log(erro);
         res.send("erro ao exibir o feed:", erro);
     }
 });
