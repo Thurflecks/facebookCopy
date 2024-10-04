@@ -27,6 +27,10 @@ const post = sequelize.define("post", {
         type: Sequelize.INTEGER,
         allowNull: true
     },
+    comments: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+    }
 }, {
     tableName: 'post',
     timestamps: false

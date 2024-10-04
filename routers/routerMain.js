@@ -15,7 +15,7 @@ const { styleText } = require("util");
 const { AsyncLocalStorage } = require("async_hooks");
 const likeModel = require("../models/Likes");
 const post = require("../models/Post");
-
+const commentModel = require("../models/Comment")
 const imagemPost = upload.fields([
     { name: 'conteudoPost', maxCount: 1 },
 ]);
@@ -99,7 +99,8 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
             legenda: legenda,
             imagem: conteudoPost,
             data_criacao: data_criacao,
-            likes: 0
+            likes: 0,
+            comments: 0
 
         })
         res.redirect("/")
@@ -116,7 +117,7 @@ router.get("/minhaConta", authenticate, async (req, res) => {
         });
 
         const id = req.session.user.id;
-        
+
         const usuario = await userModel.findOne({
             where: { iduser: id }
         });
@@ -227,6 +228,56 @@ router.post("/enviarCurtida/:idpost", authenticate, async (req, res) => {
         console.log("erro ao curtir a postagem", err)
     }
 })
+router.get("/addComment/:idpost", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    });
+    const idpost = req.params.idpost;
+
+    try {
+        const comments = await commentModel.findAll({ where: { idpost: idpost } });
+        const commentsAjeitados = await Promise.all(comments.map(async (comment) => {
+            const usuario = await userModel.findByPk(comment.iduser);
+            const fotoPerfilBase64 = usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null;
+            return {
+                ...comment.dataValues,
+                username: usuario.nome.toLowerCase(),
+                foto_perfil: fotoPerfilBase64
+            };
+        }));
+        res.render("comments", { comments: commentsAjeitados, fotoPerfil, idpost });
+    } catch (err) {
+        console.log("Erro ao acessar os comentários", err);
+        res.send("Erro ao carregar os comentários.");
+    }
+});
+
+
+
+router.post("/enviarComment/:idpost", authenticate, async (req, res) => {
+    console.log(req.params.idpost);
+    const idpost = req.params.idpost;
+    const { comentario } = req.body;
+    const post = await postModel.findOne({ where: { idpost: idpost } });
+    try {
+        await commentModel.create({
+            idpost: idpost,
+            iduser: req.session.user.id,
+            comment: comentario
+        });
+        await postModel.update({
+            comments: post.comments += 1
+        }, {
+            where: { idpost: idpost }
+        })
+
+        res.redirect(`/addComment/${idpost}`);
+
+    } catch (err) {
+        console.log("erro ao adicionar comentario", err);
+        res.send("Erro ao adicionar comentário.");
+    }
+});
 
 router.get("/notificacoes", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
@@ -297,9 +348,10 @@ router.get("/editPost/:idpost", authenticate, async (req, res) => {
 
 })
 router.post("/post/delete/:id", authenticate, async (req, res) => {
-    id = req.params.id
+    const id = req.params.id
     await postModel.destroy({ where: { idpost: id } })
-    await likeModel.destroy({where: {idpost: id} })
+    await likeModel.destroy({ where: { idpost: id } })
+    await commentModel.destroy({where: { idpost: id} })
     res.redirect("/minhaConta")
 })
 router.post("/editPost/salvando/:id", authenticate, async (req, res) => {
