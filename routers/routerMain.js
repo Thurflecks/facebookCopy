@@ -78,7 +78,7 @@ router.post("/criarConta/criando", async (req, res) => {
 
     } catch (err) {
         console.log(`erro ao criar a conta ${err}`)
-        res.redirect("/criarConta")
+        res.render("contaNova", { mensagem: "<span class='alerta'>Erro ao criar a conta. Tente novamente!</span>"})
     }
 })
 router.get("/newPost", authenticate, async (req, res) => {
