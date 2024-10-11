@@ -16,10 +16,11 @@ Você pode acessar o site aqui: [FacebookCopy](https://facebookcopy-production.u
 
 ## Tecnologias Utilizadas
 
-- **Backend**: Node.js com Express
+- **Backend**: Node.js com Express e Handlebars
 - **Banco de Dados**: MySQL com Sequelize ORM
 - **Frontend**: HTML, CSS, JavaScript
-- **Hospedagem**: Railway (https://railway.app)
+- **Hospedagem e banco de dados**: Railway (https://railway.app)
+
 
 ## Instalação Local
 
