@@ -63,7 +63,7 @@ router.get("/criarConta", verifyLogin, (req, res) => {
 
 router.post("/criarConta/criando", async (req, res) => {
     try {
-        const imagePath = '/home/two/Documentos/facebookCopy/public/imagens/default.jpeg';
+        const imagePath = path.join(__dirname, '../public/imagens/default.jpeg');
         const defaultImage = fs.readFileSync(imagePath);
         const { nomeCompleto, email, senha, dataNasc } = req.body;
         await userModel.create({
