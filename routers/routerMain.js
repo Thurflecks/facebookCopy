@@ -40,11 +40,11 @@ router.post("/login/conta", async (req, res) => {
             res.redirect("/")
         }).catch(erro => {
             console.log(erro)
-            res.render("login", { alerta: "<span class='alerta'>Usuário ou senha incorreto!</span>" })
+            res.render("login", { alerta: "<span class='alerta'>Usuário ou senha inválidos!</span>" })
         })
     } catch (err) {
         console.log("erro ao fazer o login", err)
-        res.render("login", { alerta: "<span class='alerta'>Usuário ou senha incorreto!</span>" })
+        res.render("login", { alerta: "<span class='alerta'>Usuário ou senha inválidos!</span>" })
     }
 })
 router.post("/logout", (req, res) => {
