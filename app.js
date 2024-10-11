@@ -19,7 +19,7 @@ app.engine("handlebars", engine({
 app.set("view engine", "handlebars")
 
 app.use(session({
-    secret: 'faceCopy',
+    secret: 'senhaFaceCopy',
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }
@@ -33,5 +33,5 @@ app.use(router)
 
 //escutando porta
 app.listen(port, () =>{
-    console.log("site online")
+    console.log("site online em: http://localhost:8081")
 })

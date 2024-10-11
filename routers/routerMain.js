@@ -235,7 +235,7 @@ router.get("/addComment/:idpost", authenticate, async (req, res) => {
     const idpost = req.params.idpost;
 
     try {
-        const comments = await commentModel.findAll({ where: { idpost: idpost } });
+        const comments = await commentModel.findAll({ where: { idpost: idpost }, order: [['idcomments', 'DESC']] });
         const commentsAjeitados = await Promise.all(comments.map(async (comment) => {
             const usuario = await userModel.findByPk(comment.iduser);
             const fotoPerfilBase64 = usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null;
@@ -412,5 +412,11 @@ router.get("/", authenticate, async (req, res) => {
     }
 });
 
+router.get("/*", authenticate, async(req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    });
+    res.render("status404", { mensagem404: "Essa página não exite :/", fotoPerfil})
+})
 
 module.exports = router
