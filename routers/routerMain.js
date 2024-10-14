@@ -47,13 +47,16 @@ router.post("/login/conta", async (req, res) => {
         res.render("login", { alerta: "<span class='alerta'>Usuário ou senha inválidos!</span>" })
     }
 })
-router.post("/logout", (req, res) => {
+router.post("/logout", async (req, res) => {
     try {
         req.session.destroy()
         res.clearCookie("connect.sid")
         res.redirect("/login")
     } catch (err) {
-        console.log("erro ao sair da conta", err)
+        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+        })
+        res.render("status404", { mensagem404: "Encontramos um erro ao sair da conta", fotoPerfil })
     }
 })
 
@@ -78,17 +81,25 @@ router.post("/criarConta/criando", async (req, res) => {
 
     } catch (err) {
         console.log(`erro ao criar a conta ${err}`)
-        res.render("contaNova", { mensagem: "<span class='alerta'>Erro ao criar a conta. Tente novamente!</span>"})
+        res.render("contaNova", { mensagem: "<span class='alerta'>Erro ao criar a conta. Tente novamente!</span>" })
     }
 })
 router.get("/newPost", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
     })
-    res.render("newPost", { fotoPerfil })
+    try {
+        res.render("newPost", { fotoPerfil })
+    } catch (err) {
+        res.render("status404", { mensagem404: "Erro ao carregar essa página", fotoPerfil })
+    }
 })
 
+
 router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
     try {
         const conteudoPost = req.files['conteudoPost'] ? req.files['conteudoPost'][0].buffer : null
         const agora = new Date();
@@ -106,15 +117,15 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
         res.redirect("/")
 
     } catch (erro) {
-        res.send("erro ao enviar o post:", erro)
+        res.render("status404", { mensagem404: "Erro ao enviar o post", fotoPerfil })
     }
 
 })
 router.get("/minhaConta", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    });
     try {
-        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
-            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-        });
 
         const id = req.session.user.id;
 
@@ -148,27 +159,29 @@ router.get("/minhaConta", authenticate, async (req, res) => {
 
         res.render("minhaConta", { fotoPerfil, usuario, postsConta });
     } catch (err) {
-        console.log("Erro ao carregar a conta:", err);
-        res.send("Erro ao carregar a conta.");
+        res.render("status404", { mensagem404: "Erro ao carregar essa página", fotoPerfil })
     }
 });
 
 router.get("/minhaConta/editarPerfil", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
     try {
-        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
-            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-        })
         await userModel.findByPk(req.session.user.id).then(function (conta) {
 
             res.render("editarPerfil", { fotoPerfil, usuarioConta: conta });
         });
 
     } catch (err) {
-        console.log("erro ao exibir o editar da conta: ", err)
+        res.render("status404", { mensagem404: "Erro ao carregar essa página", fotoPerfil })
     }
 })
 
 router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
     try {
         const fotoPerfilAtt = req.files['fotoPerfilAtt'] ? req.files['fotoPerfilAtt'][0].buffer : null
         const { nomeAtt, bioAtt } = req.body;
@@ -183,12 +196,14 @@ router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, 
         await userModel.update(atualizacoes, { where: { iduser: id } });
         res.redirect("/minhaConta");
     } catch (err) {
-        console.log(err)
-        res.send("deu erro atualizando o perfil")
+        res.render("status404", { mensagem404: "Erro ao salvar as alterações", fotoPerfil })
     }
 })
 
 router.post("/enviarCurtida/:idpost", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
     const id = req.params.idpost
     const post = await postModel.findOne({ where: { idpost: id } });
     try {
@@ -225,7 +240,7 @@ router.post("/enviarCurtida/:idpost", authenticate, async (req, res) => {
             res.redirect(req.get('Referer'))
         }
     } catch (err) {
-        console.log("erro ao curtir a postagem", err)
+        res.render("status404", { mensagem404: "Erro ao curtir a postagem", fotoPerfil })
     }
 })
 router.get("/addComment/:idpost", authenticate, async (req, res) => {
@@ -247,14 +262,16 @@ router.get("/addComment/:idpost", authenticate, async (req, res) => {
         }));
         res.render("comments", { comments: commentsAjeitados, fotoPerfil, idpost });
     } catch (err) {
-        console.log("Erro ao acessar os comentários", err);
-        res.send("Erro ao carregar os comentários.");
+        res.render("status404", { mensagem404: "Erro ao carregar os comentários dessa postagem", fotoPerfil })
     }
 });
 
 
 
 router.post("/enviarComment/:idpost", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
     console.log(req.params.idpost);
     const idpost = req.params.idpost;
     const { comentario } = req.body;
@@ -274,8 +291,7 @@ router.post("/enviarComment/:idpost", authenticate, async (req, res) => {
         res.redirect(`/addComment/${idpost}`);
 
     } catch (err) {
-        console.log("erro ao adicionar comentario", err);
-        res.send("Erro ao adicionar comentário.");
+        res.render("status404", { mensagem404: "Erro ao salvar o comentário.", fotoPerfil })
     }
 });
 
@@ -287,10 +303,10 @@ router.get("/notificacoes", authenticate, async (req, res) => {
     res.render("notificacoes", { fotoPerfil })
 })
 router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    });
     try {
-        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
-            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-        });
         const idpost = req.params.idpost;
 
         const post = await postModel.findOne({
@@ -331,8 +347,7 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
 
         res.render("perfilPosts", { fotoPerfilBase64, usuario, postsConta, fotoPerfil });
     } catch (erro) {
-        console.log(erro);
-        res.send("Erro ao carregar a conta");
+        res.render("status404", { mensagem404: "Erro ao acessar essa conta", fotoPerfil })
     }
 });
 
@@ -342,19 +357,34 @@ router.get("/editPost/:idpost", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
     })
-    await postModel.findByPk(req.params.idpost).then(post => {
-        res.render("editPost", { fotoPerfil, post: post });
-    });
+    try {
+        await postModel.findByPk(req.params.idpost).then(post => {
+            res.render("editPost", { fotoPerfil, post: post });
+        });
+    } catch (err) {
+        res.render("status404", { mensagem404: "Erro ao carregar essa página.", fotoPerfil })
+    }
 
 })
 router.post("/post/delete/:id", authenticate, async (req, res) => {
     const id = req.params.id
-    await postModel.destroy({ where: { idpost: id } })
-    await likeModel.destroy({ where: { idpost: id } })
-    await commentModel.destroy({where: { idpost: id} })
-    res.redirect("/minhaConta")
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
+    try {
+        await postModel.destroy({ where: { idpost: id } })
+        await likeModel.destroy({ where: { idpost: id } })
+        await commentModel.destroy({ where: { idpost: id } })
+        res.redirect("/minhaConta")
+    } catch (err) {
+        res.render("status404", { mensagem404: "Erro ao apagar esse postagem.", fotoPerfil })
+    }
+
 })
 router.post("/editPost/salvando/:id", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
     try {
         let { legendaNova } = req.body;
         const id = req.params.id;
@@ -364,7 +394,7 @@ router.post("/editPost/salvando/:id", authenticate, async (req, res) => {
         );
         res.redirect("/minhaConta")
     } catch (err) {
-        console.log(err)
+        res.render("status404", { mensagem404: "Erro ao salvar as alterações.", fotoPerfil })
     }
 })
 router.get("/amigos", authenticate, async (req, res) => {
@@ -412,11 +442,11 @@ router.get("/", authenticate, async (req, res) => {
     }
 });
 
-router.get("/*", authenticate, async(req, res) => {
+router.get("/*", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
     });
-    res.render("status404", { mensagem404: "Essa página não exite :/", fotoPerfil})
+    res.render("status404", { mensagem404: "Essa página não exite :/", fotoPerfil })
 })
 
 module.exports = router
