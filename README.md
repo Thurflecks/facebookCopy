@@ -55,6 +55,3 @@ Para rodar o projeto localmente, siga os passos abaixo:
 
 Se você deseja contribuir com o projeto, fique à vontade para abrir issues ou pull requests no repositório GitHub.
 
-## Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
