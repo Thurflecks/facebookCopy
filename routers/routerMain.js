@@ -14,6 +14,7 @@ const { where } = require("sequelize");
 const { styleText } = require("util");
 const { AsyncLocalStorage } = require("async_hooks");
 const likeModel = require("../models/Likes");
+const followerModel = require("../models/Follower")
 const post = require("../models/Post");
 const commentModel = require("../models/Comment")
 const imagemPost = upload.fields([
@@ -345,9 +346,9 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
             };
         });
 
-        res.render("perfilPosts", { fotoPerfilBase64, usuario, postsConta, fotoPerfil });
+        res.render("perfilPosts", { fotoPerfilBase64, usuario, postsConta, fotoPerfil, idpost });
     } catch (erro) {
-        res.render("status404", { mensagem404: "Erro ao acessar essa conta", fotoPerfil })
+        res.render("status404", { mensagem404: "Erro ao acessar essa conta", fotoPerfil})
     }
 });
 
@@ -441,6 +442,24 @@ router.get("/", authenticate, async (req, res) => {
         res.send("erro ao exibir o feed:", erro);
     }
 });
+router.post("/seguir/:idpost", authenticate, async(req, res) => {
+    const idpost = req.params.idpost
+    try {
+        const post = await postModel.findOne({
+            where: { idpost: idpost }
+        })
+        console.log(post.iduser)
+        followerModel.create({
+            iduser: req.session.user.id,
+            idseguidor: idpost
+        })
+
+        res.redirect(req.get('Referer'))
+    } catch (erro) {
+        console.log(erro)
+    }
+
+})
 
 router.get("/*", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {

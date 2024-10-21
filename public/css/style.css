@@ -487,3 +487,10 @@ body {
 .aviso404 p{
     font-weight: 900;
 }
+.btnSeguir{
+    border:none ;
+    background-color: #046cdc;
+    color: aliceblue;
+    padding: 5px 20px;
+    border-radius: 5px;
+}
