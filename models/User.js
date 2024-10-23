@@ -30,6 +30,14 @@ const user = sequelize.define("user", {
     foto_perfil: {
         type: Sequelize.STRING,
         allowNull: true
+    },
+    seguidores: {
+        type: Sequelize.STRING,
+        allowNull: true
+    },
+    seguindo: {
+        type: Sequelize.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'user',

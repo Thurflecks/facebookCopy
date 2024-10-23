@@ -30,9 +30,18 @@
             <img class="fotoPerfilLogada" src="data:image/png;base64,{{fotoPerfilBase64}}" alt="fot perfil">
             <p class="nomeContaLogada" name="nomeContaLogada">{{usuario.nome}}</p>
             <label for="" name="bioContaLogada" id="bioContaLogada">{{usuario.bio}}</label>
-            <form action="/seguir/{{idpost}}" class="formSeguir">
+            <form action="/seguir/{{idpost}}" class="formSeguir" method="post">
+                {{#unless isFollower}}
                 <button type="submit" class="btnSeguir">Seguir</button>
+                {{else}}
+                <button type="submit" class="btnSeguindo">Seguindo</button>
+                {{/unless}}
             </form>
+            <div class="seguir">
+                <span>Seguindo {{usuario.seguindo}}</span>
+                <span>Seguidores {{usuario.seguidores}}</span>
+            </div>
+
 
         </div>
     </div>

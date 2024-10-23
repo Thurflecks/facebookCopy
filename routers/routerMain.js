@@ -16,7 +16,10 @@ const { AsyncLocalStorage } = require("async_hooks");
 const likeModel = require("../models/Likes");
 const followerModel = require("../models/Follower")
 const post = require("../models/Post");
-const commentModel = require("../models/Comment")
+const commentModel = require("../models/Comment");
+const { isFloat32Array } = require("util/types");
+
+
 const imagemPost = upload.fields([
     { name: 'conteudoPost', maxCount: 1 },
 ]);
@@ -54,6 +57,7 @@ router.post("/logout", async (req, res) => {
         res.clearCookie("connect.sid")
         res.redirect("/login")
     } catch (err) {
+        console.log(err)
         const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
             return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
         })
@@ -75,7 +79,9 @@ router.post("/criarConta/criando", async (req, res) => {
             email: email,
             senha: senha,
             data_nascimento: dataNasc,
-            foto_perfil: defaultImage
+            foto_perfil: defaultImage,
+            seguidores: 0,
+            seguindo: 0
 
         })
         res.redirect("/login")
@@ -92,6 +98,7 @@ router.get("/newPost", authenticate, async (req, res) => {
     try {
         res.render("newPost", { fotoPerfil })
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao carregar essa página", fotoPerfil })
     }
 })
@@ -118,6 +125,7 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
         res.redirect("/")
 
     } catch (erro) {
+        console.log(erro)
         res.render("status404", { mensagem404: "Erro ao enviar o post", fotoPerfil })
     }
 
@@ -160,6 +168,7 @@ router.get("/minhaConta", authenticate, async (req, res) => {
 
         res.render("minhaConta", { fotoPerfil, usuario, postsConta });
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao carregar essa página", fotoPerfil })
     }
 });
@@ -175,6 +184,7 @@ router.get("/minhaConta/editarPerfil", authenticate, async (req, res) => {
         });
 
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao carregar essa página", fotoPerfil })
     }
 })
@@ -197,6 +207,7 @@ router.post("/minhaConta/editarPerfil/atualizando", authenticate, imagemPerfil, 
         await userModel.update(atualizacoes, { where: { iduser: id } });
         res.redirect("/minhaConta");
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao salvar as alterações", fotoPerfil })
     }
 })
@@ -241,6 +252,7 @@ router.post("/enviarCurtida/:idpost", authenticate, async (req, res) => {
             res.redirect(req.get('Referer'))
         }
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao curtir a postagem", fotoPerfil })
     }
 })
@@ -263,6 +275,7 @@ router.get("/addComment/:idpost", authenticate, async (req, res) => {
         }));
         res.render("comments", { comments: commentsAjeitados, fotoPerfil, idpost });
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao carregar os comentários dessa postagem", fotoPerfil })
     }
 });
@@ -292,6 +305,7 @@ router.post("/enviarComment/:idpost", authenticate, async (req, res) => {
         res.redirect(`/addComment/${idpost}`);
 
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao salvar o comentário.", fotoPerfil })
     }
 });
@@ -333,8 +347,13 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
                 iduser: req.session.user.id
             }
         });
-
-
+        const isFollower = await followerModel.findOne({
+            where: {
+                iduser: req.session.user.id,
+                idseguidor: post.iduser
+            }
+        })
+        
         const postsConta = postUser.map(post => {
             const imagemBase64 = post.imagem ? Buffer.from(post.imagem).toString('base64') : null;
             return {
@@ -346,9 +365,10 @@ router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
             };
         });
 
-        res.render("perfilPosts", { fotoPerfilBase64, usuario, postsConta, fotoPerfil, idpost });
+        res.render("perfilPosts", { fotoPerfilBase64, usuario, postsConta, fotoPerfil, idpost, isFollower});
     } catch (erro) {
-        res.render("status404", { mensagem404: "Erro ao acessar essa conta", fotoPerfil})
+        console.log(erro)
+        res.render("status404", { mensagem404: "Erro ao acessar essa conta", fotoPerfil })
     }
 });
 
@@ -363,6 +383,7 @@ router.get("/editPost/:idpost", authenticate, async (req, res) => {
             res.render("editPost", { fotoPerfil, post: post });
         });
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao carregar essa página.", fotoPerfil })
     }
 
@@ -378,6 +399,7 @@ router.post("/post/delete/:id", authenticate, async (req, res) => {
         await commentModel.destroy({ where: { idpost: id } })
         res.redirect("/minhaConta")
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao apagar esse postagem.", fotoPerfil })
     }
 
@@ -395,6 +417,7 @@ router.post("/editPost/salvando/:id", authenticate, async (req, res) => {
         );
         res.redirect("/minhaConta")
     } catch (err) {
+        console.log(err)
         res.render("status404", { mensagem404: "Erro ao salvar as alterações.", fotoPerfil })
     }
 })
@@ -442,20 +465,61 @@ router.get("/", authenticate, async (req, res) => {
         res.send("erro ao exibir o feed:", erro);
     }
 });
-router.post("/seguir/:idpost", authenticate, async(req, res) => {
+router.post("/seguir/:idpost", authenticate, async (req, res) => {
     const idpost = req.params.idpost
+    const post = await postModel.findOne({
+        where: { idpost: idpost }
+    })
+    const user1 = await userModel.findOne({where:{iduser: post.iduser } })
+    const user2 = await userModel.findOne({where:{iduser: req.session.user.id } })
     try {
-        const post = await postModel.findOne({
-            where: { idpost: idpost }
+        const existingFollower = await followerModel.findOne({
+            where: {
+                iduser: req.session.user.id,
+                idseguidor: post.iduser
+            }
         })
-        console.log(post.iduser)
-        followerModel.create({
-            iduser: req.session.user.id,
-            idseguidor: idpost
-        })
+        if (!!existingFollower) {
+            await followerModel.destroy({
+                where: {
+                    iduser: req.session.user.id,
+                    idseguidor: post.iduser
+                }
+            })
+            await userModel.update({
+                seguidores: user1.seguidores - 1
+            }, {where: {
+                iduser: post.iduser
+            }})
+            await userModel.update({
+                seguindo: user2.seguindo - 1
+            }, { where: {
+                iduser: req.session.user.id
+            }})
+            res.redirect(req.get("Referer"))
 
-        res.redirect(req.get('Referer'))
+        } else {
+            await followerModel.create({
+                    iduser: req.session.user.id,
+                    idseguidor: post.iduser
+            })
+            await userModel.update({
+                seguidores: user1.seguidores + 1
+            }, {where: {
+                iduser: post.iduser
+            }})
+            await userModel.update({
+                seguindo: user2.seguindo + 1
+            }, { where: {
+                iduser: req.session.user.id
+            }})
+            res.redirect(req.get("Referer"))
+        }
     } catch (erro) {
+        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+        });
+        res.render("status404", { mensagem404: "Erro ao seguir o usuário", fotoPerfil })
         console.log(erro)
     }
 
