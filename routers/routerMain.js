@@ -109,27 +109,33 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
     })
     try {
-        const conteudoPost = req.files['conteudoPost'] ? req.files['conteudoPost'][0].buffer : null
+        const conteudoPost = req.files['conteudoPost'] ? req.files['conteudoPost'][0] : null;
+        
+        // Verifica se o conteúdo do post é uma imagem
+        if (conteudoPost && !conteudoPost.mimetype.startsWith('image/')) {
+            throw new Error("Apenas arquivos de imagem são permitidos.");
+        }
+
         const agora = new Date();
         const data_criacao = agora.toISOString().slice(0, 10);
         const { legenda } = req.body;
+
         await postModel.create({
             iduser: req.session.user.id,
             legenda: legenda,
-            imagem: conteudoPost,
+            imagem: conteudoPost ? conteudoPost.buffer : null,
             data_criacao: data_criacao,
             likes: 0,
             comments: 0
+        });
 
-        })
-        res.redirect("/")
-
+        res.redirect("/");
     } catch (erro) {
-        console.log(erro)
-        res.render("status404", { mensagem404: "Erro ao enviar o post", fotoPerfil })
+        console.log(erro);
+        res.render("status404", { mensagem404: "Erro ao enviar o post: " + erro.message, fotoPerfil });
     }
+});
 
-})
 router.get("/minhaConta", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
