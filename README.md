@@ -11,6 +11,7 @@ Você pode acessar o site aqui: [FacebookCopy](https://facebookcopy-production.u
 - **Autenticação de Usuário**: Os usuários podem criar contas, fazer login e logout.
 - **Postagens**: Os usuários podem criar novas postagens.
 - **Comentários**: Os usuários podem comentar em postagens.
+- **Opções de seguir ou não usuários**: Usuários podem fazer amizades e trocar likes.
 - **Feed de Notícias**: Veja as postagens mais recentes dos usuários.
 - **Interface Simples**: Design inspirado no Facebook, mas com uma interface simplificada e fácil de usar.
 
