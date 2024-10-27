@@ -487,20 +487,24 @@ body {
 .aviso404 p{
     font-weight: 900;
 }
+.formSeguir{
+    font-family: JetBrains;
+}
 .btnSeguir{
     border:none ;
     background-color: #046cdc;
     color: aliceblue;
-    padding: 6px 21px;
+    padding: 8px 25px;
     border-radius: 5px;
+    font-size: .9rem;
 }
 .btnSeguindo{
     border:none ;
     border: #046cdc solid 1px;
     color: #046cdc;
-    padding: 5px 20px;
+    padding: 7px 24px;
     border-radius: 5px;
-    
+    font-size: .9rem;
 }
 .seguir{
     display: flex;
