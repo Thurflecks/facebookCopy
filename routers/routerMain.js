@@ -18,6 +18,7 @@ const followerModel = require("../models/Follower")
 const post = require("../models/Post");
 const commentModel = require("../models/Comment");
 const { isFloat32Array } = require("util/types");
+const notificacoesModel = require("../models/Notificacoes")
 
 
 const imagemPost = upload.fields([
@@ -110,7 +111,7 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
     })
     try {
         const conteudoPost = req.files['conteudoPost'] ? req.files['conteudoPost'][0] : null;
-        
+
         // Verifica se o conteúdo do post é uma imagem
         if (conteudoPost && !conteudoPost.mimetype.startsWith('image/')) {
             throw new Error("Apenas arquivos de imagem são permitidos.");
@@ -323,62 +324,6 @@ router.get("/notificacoes", authenticate, async (req, res) => {
 
     res.render("notificacoes", { fotoPerfil })
 })
-router.get("/perfilPosts/:idpost", authenticate, async (req, res) => {
-    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
-        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-    });
-    try {
-        const idpost = req.params.idpost;
-
-        const post = await postModel.findOne({
-            where: { idpost: idpost }
-        });
-        const userid = post.iduser;
-        if (userid === req.session.user.id) {
-            res.redirect("/minhaConta");
-        }
-
-        const usuario = await userModel.findOne({
-            where: { iduser: userid }
-        });
-        const fotoPerfilBase64 = usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null;
-
-        const postUser = await postModel.findAll({
-            where: { iduser: userid },
-            order: [['idpost', 'DESC']]
-        });
-        const liked = await likeModel.findOne({
-            where: {
-                idpost: post.idpost,
-                iduser: req.session.user.id
-            }
-        });
-        const isFollower = await followerModel.findOne({
-            where: {
-                iduser: req.session.user.id,
-                idseguidor: post.iduser
-            }
-        })
-        
-        const postsConta = postUser.map(post => {
-            const imagemBase64 = post.imagem ? Buffer.from(post.imagem).toString('base64') : null;
-            return {
-                ...post.dataValues,
-                username: usuario.nome.toLowerCase(),
-                foto_perfil: fotoPerfilBase64,
-                imagem: imagemBase64,
-                isLiked: !!liked
-            };
-        });
-
-        res.render("perfilPosts", { fotoPerfilBase64, usuario, postsConta, fotoPerfil, idpost, isFollower});
-    } catch (erro) {
-        console.log(erro)
-        res.render("status404", { mensagem404: "Erro ao acessar essa conta", fotoPerfil })
-    }
-});
-
-
 
 router.get("/editPost/:idpost", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
@@ -428,12 +373,77 @@ router.post("/editPost/salvando/:id", authenticate, async (req, res) => {
     }
 })
 router.get("/amigos", authenticate, async (req, res) => {
+    try {
+        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+        });
+
+        const usuarios = await userModel.findAll();
+
+        const Users = usuarios.map(usuario => {
+            return {
+                ...usuario.dataValues,
+                username: usuario.nome.toLowerCase(),
+                foto_perfil: usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null
+            };
+        });
+
+        res.render("amigos", { fotoPerfil, Users });
+    } catch (err) {
+        console.log(err);
+        res.render('status404', { mensagem404: 'Erro ao carregar essa página', fotoPerfil });
+    }
+});
+router.get("/perfil/:iduser", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-    })
+    });
 
-    res.render("amigos", { fotoPerfil })
-})
+    try {
+        const iduser = req.params.iduser;
+
+        if (iduser === req.session.user.id) {
+            return res.redirect("/minhaConta");
+        }
+
+        const usuario = await userModel.findOne({ where: { iduser: iduser } });
+        const fotoPerfilBase64 = usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null;
+
+        const postUser = await postModel.findAll({
+            where: { iduser: iduser },
+            order: [['idpost', 'DESC']]
+        });
+
+        const postsConta = postUser.map(post => {
+            const imagemBase64 = post.imagem ? Buffer.from(post.imagem).toString('base64') : null;
+            return {
+                ...post.dataValues,
+                username: usuario.nome.toLowerCase(),
+                foto_perfil: fotoPerfilBase64,
+                imagem: imagemBase64
+            };
+        });
+
+        const liked = await likeModel.findOne({
+            where: {
+                idpost: postUser.length ? postUser[0].idpost : null,
+                iduser: req.session.user.id
+            }
+        });
+
+        const isFollower = await followerModel.findOne({
+            where: {
+                iduser: req.session.user.id,
+                idseguidor: iduser
+            }
+        });
+
+        res.render("perfil", { fotoPerfilBase64, usuario, postsConta, fotoPerfil, isFollower, isLiked: !!liked });
+    } catch (err) {
+        console.log(err);
+        res.render('status404', { mensagem404: 'Erro ao carregar essa página', fotoPerfil });
+    }
+});
 
 
 router.get("/", authenticate, async (req, res) => {
@@ -476,8 +486,8 @@ router.post("/seguir/:idpost", authenticate, async (req, res) => {
     const post = await postModel.findOne({
         where: { idpost: idpost }
     })
-    const user1 = await userModel.findOne({where:{iduser: post.iduser } })
-    const user2 = await userModel.findOne({where:{iduser: req.session.user.id } })
+    const user1 = await userModel.findOne({ where: { iduser: post.iduser } })
+    const user2 = await userModel.findOne({ where: { iduser: req.session.user.id } })
     try {
         const existingFollower = await followerModel.findOne({
             where: {
@@ -494,31 +504,39 @@ router.post("/seguir/:idpost", authenticate, async (req, res) => {
             })
             await userModel.update({
                 seguidores: user1.seguidores - 1
-            }, {where: {
-                iduser: post.iduser
-            }})
+            }, {
+                where: {
+                    iduser: post.iduser
+                }
+            })
             await userModel.update({
                 seguindo: user2.seguindo - 1
-            }, { where: {
-                iduser: req.session.user.id
-            }})
+            }, {
+                where: {
+                    iduser: req.session.user.id
+                }
+            })
             res.redirect(req.get("Referer"))
 
         } else {
             await followerModel.create({
-                    iduser: req.session.user.id,
-                    idseguidor: post.iduser
+                iduser: req.session.user.id,
+                idseguidor: post.iduser
             })
             await userModel.update({
                 seguidores: user1.seguidores + 1
-            }, {where: {
-                iduser: post.iduser
-            }})
+            }, {
+                where: {
+                    iduser: post.iduser
+                }
+            })
             await userModel.update({
                 seguindo: user2.seguindo + 1
-            }, { where: {
-                iduser: req.session.user.id
-            }})
+            }, {
+                where: {
+                    iduser: req.session.user.id
+                }
+            })
             res.redirect(req.get("Referer"))
         }
     } catch (erro) {

@@ -22,12 +22,23 @@
                             stroke-width="2" x1="12.003" x2="12.003" y1="6.545" y2="17.455"></line>
                     </svg></a>
                 <a href="/notificacoes"><i class='bx bx-bell'></i></a>
-                <a href="/minhaConta"><img class="minhaContaNav" src="data:image/png;base64,{{fotoPerfil}}" alt="fot perfil"></a>
+                <a href="/minhaConta"><img class="minhaContaNav" src="data:image/png;base64,{{fotoPerfil}}"
+                        alt="fot perfil"></a>
             </div>
         </nav>
         <div>
-           
+            <br>
+            {{#each Users}}
+            <div class="amigosAdd">
+                <a href="/perfil/{{iduser}}" class="nomeperfil">
+                    <img class="fotoPerfil" src="data:image/png;base64,{{this.foto_perfil}}" alt="foto perfil">
+                    <p>{{this.username}}</p>
+                </a>
+
+            </div>
+            {{/each}}
         </div>
+
     </div>
     <div>
         <div class="div-fim">
