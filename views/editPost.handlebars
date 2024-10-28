@@ -27,6 +27,7 @@
             </div>
         </nav>
         <form class="formNewpost" action="/editPost/salvando/{{post.idpost}}" method="post">
+            <img class="editImagemPost" src="data:image/png;base64,{{imagemBase64}}" alt="conteudo post">
             <label for="text" id="text-legenda">LEGENDA:</label>
             <textarea id="legendaPost" name="legendaNova" rows="4" cols="50"
                 class="formAtt bioatt">{{{post.legenda}}}</textarea><br>

@@ -51,10 +51,7 @@
                 </a>
                 <div class="post-actions">
                     <a href="/editPost/{{idpost}}" class="edit-btn">Editar</a>
-                    <form action="/post/delete/{{idpost}}" method="POST"
-                        onsubmit="return confirm('Tem certeza que deseja deletar este post?');">
-                        <button type="submit" class="delete-btn">Deletar</button>
-                    </form>
+                    <a href="/post/delete/{{idpost}}" class="delete-btn">Deletar</a>
                 </div>
             </div>
             <img class="imagemPost" src="data:image/png;base64,{{imagem}}" alt="conteudo post">

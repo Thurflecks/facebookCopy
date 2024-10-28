@@ -12,10 +12,14 @@ app.use(express.static(path.join(__dirname, "public")))
 
 //config handlebars
 app.engine("handlebars", engine({
-    defaultLayout: "main", runtimeOptions: {
+    defaultLayout: "main",
+    runtimeOptions: {
         allowProtoPropertiesByDefault: true,
-    }}
-))
+    },
+    helpers: {
+        eq: (a, b) => a === b,
+    },
+}));
 app.set("view engine", "handlebars")
 
 app.use(session({
@@ -26,12 +30,12 @@ app.use(session({
 }));
 
 app.use(express.json());
-app.use(express.urlencoded({ extended : true}));
+app.use(express.urlencoded({ extended: true }));
 //config rotas
 app.use(router)
 
 
 //escutando porta
-app.listen(port, () =>{
+app.listen(port, () => {
     console.log("site online em: http://localhost:8081")
 })

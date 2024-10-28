@@ -27,14 +27,27 @@
             </div>
         </nav>
         <div>
-            <br>
+            <div class="pesquisa">
+                <form action="" method="post">
+                    <input type="text" name="nome">
+                    <button type="submit"><i class='bx bx-search'></i></button>
+                </form>
+            </div>
             {{#each Users}}
             <div class="amigosAdd">
-                <a href="/perfil/{{iduser}}" class="nomeperfil">
-                    <img class="fotoPerfil" src="data:image/png;base64,{{this.foto_perfil}}" alt="foto perfil">
-                    <p>{{this.username}}</p>
-                </a>
-
+                <div class="user">
+                    <a href="/perfil/{{iduser}}" class="nomeperfil">
+                        <img class="fotoPerfil" src="data:image/png;base64,{{this.foto_perfil}}" alt="foto perfil">
+                        <p class="nameuser">{{this.username}}</p>
+                    </a>
+                    <form action="/seguir/{{iduser}}" class="formSeguir" method="post">
+                        {{#unless isFollower}}
+                        <button type="submit" class="btnSeguir1">Seguir</button>
+                        {{else}}
+                        <button type="submit" class="btnSeguindo1">Seguindo</button>
+                        {{/unless}}
+                    </form>
+                </div>
             </div>
             {{/each}}
         </div>
