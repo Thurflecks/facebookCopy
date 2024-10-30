@@ -28,15 +28,22 @@
         </nav>
         <div>
             <div class="pesquisa">
-                <form action="" method="post">
-                    <input type="text" name="nome">
-                    <button type="submit"><i class='bx bx-search'></i></button>
+                <form action="/amigos/search" class="formPesq" method="post">
+                    <input type="text" class="inputPesquisa" name="nome">
+                    <input type="submit" id="inputP">
+                    <label for="inputP"><svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
+                            viewBox="0 0 101 101" id="search" class="search">
+                            <path
+                                d="M63.3 59.9c3.8-4.6 6.2-10.5 6.2-17 0-14.6-11.9-26.5-26.5-26.5S16.5 28.3 16.5 42.9 28.4 69.4 43 69.4c6.4 0 12.4-2.3 17-6.2l20.6 20.6c.5.5 1.1.7 1.7.7.6 0 1.2-.2 1.7-.7.9-.9.9-2.5 0-3.4L63.3 59.9zm-20.4 4.7c-12 0-21.7-9.7-21.7-21.7s9.7-21.7 21.7-21.7 21.7 9.7 21.7 21.7-9.7 21.7-21.7 21.7z">
+                            </path>
+                        </svg>
+                    </label>
                 </form>
             </div>
             {{#each Users}}
             <div class="amigosAdd">
                 <div class="user">
-                    <a href="/perfil/{{iduser}}" class="nomeperfil">
+                    <a href="/perfil/{{iduser}}" class="nomeperfil flex">
                         <img class="fotoPerfil" src="data:image/png;base64,{{this.foto_perfil}}" alt="foto perfil">
                         <p class="nameuser">{{this.username}}</p>
                     </a>
@@ -50,6 +57,9 @@
                 </div>
             </div>
             {{/each}}
+            <div class="msg">
+                <p>{{msg}}</p>
+            </div>
         </div>
 
     </div>

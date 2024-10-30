@@ -407,14 +407,12 @@ body {
 
 }
 .logout button{
-    font-size: 16px;
+    font-size: 30px;
     border: none;
-    margin-right: 20px;
+    margin-right: 10px;
     color: #046cdc;
     cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 5px;
-    background-color:  rgb(229, 233, 238);
+    background-color: transparent;
 }
 .alerta {
     display: flex;
@@ -492,16 +490,14 @@ body {
 .aviso404 p{
     font-weight: 900;
 }
-.formSeguir{
-    font-family: JetBrains;
-}
 .btnSeguir{
     border:none ;
     background-color: #046cdc;
     color: aliceblue;
     padding: 8px 25px;
     border-radius: 5px;
-    font-size: .9rem;
+    font-size: 1rem;
+    font-family: JetBrains;
 }
 .btnSeguindo{
     border:none ;
@@ -509,7 +505,8 @@ body {
     color: #046cdc;
     padding: 7px 24px;
     border-radius: 5px;
-    font-size: .9rem;
+    font-size: 1rem;
+    font-family: JetBrains;
 }
 .seguir{
     display: flex;
@@ -525,38 +522,40 @@ body {
 }
 .user{
     display: flex;
+    align-items: center;
     margin-left: 5px;
     margin-bottom: 10px;
     margin-top: 10px;
-    font-family: JetBrains;
+    font-family: JetBrains
 }
 .pesquisa{
     display: flex;
     justify-content: center;
     border-bottom: 1px solid rgb(203, 210, 217);
     padding: 1rem;
+    font-family: JetBrains;
 }
 .btnSeguir1{
-    border:none ;
+    border: none;
     background-color: #046cdc;
     color: aliceblue;
     padding: 5px 20px;
     border-radius: 5px;
-    font-size: .9rem;
-    margin-left: 3rem;
-    margin-top: .5rem;
+    font-size: 0.9rem;
+    margin-right: 30px;
+    margin-top: 0.5rem;
     font-family: JetBrains;
 }
 .btnSeguindo1{
-    border:none ;
-    border: #046cdc solid 1px;
+    border: 1px solid #046cdc;
     color: #046cdc;
+    background-color: transparent;
     padding: 4px 19px;
     border-radius: 5px;
-    font-size: .9rem;
-    margin-left: 3rem;
-    margin-top: .5rem;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
     font-family: JetBrains;
+    margin-right: 30px;
 }
 .fotoperfilEdit{
     display: flex;
@@ -573,4 +572,35 @@ body {
     position: sticky;
     top: 0;
     background-color: white;
+}
+.formPesq{
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+.formPesq svg{
+    width: 30px;
+    height: 30px;
+}
+#inputP{
+    display: none;
+}
+.inputPesquisa{
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 8px 17px;
+}
+.msg{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 100px;
+    font-family: JetBrains;
+}
+.msg p{
+    color:  rgb(196, 23, 23);
+    font-size: 20px;
+}
+.flex{
+    flex-grow: 1
 }

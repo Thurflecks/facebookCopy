@@ -412,6 +412,49 @@ router.get("/amigos", authenticate, async (req, res) => {
         res.render('status404', { mensagem404: 'Erro ao carregar essa página', fotoPerfil });
     }
 });
+router.post("/amigos/search", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    });
+
+    try {
+
+        const {nome} = req.body
+
+        const usuarios = await userModel.findAll({
+            where: {
+                iduser: { [Op.ne]: req.session.user.id },
+                nome: nome
+            }
+        });
+        if (!usuarios || usuarios.length === 0) {
+            return res.render("amigos", { fotoPerfil, Users: [], msg: "Nenhum usuário encontrado!" });
+        }
+
+        const Users = await Promise.all(
+            usuarios.map(async usuario => {
+                const isFollower = await followerModel.findOne({
+                    where: {
+                        iduser: req.session.user.id,
+                        idseguidor: usuario.iduser
+                    }
+                });
+
+                return {
+                    ...usuario.dataValues,
+                    username: usuario.nome.toLowerCase(),
+                    foto_perfil: usuario.foto_perfil ? Buffer.from(usuario.foto_perfil).toString('base64') : null,
+                    isFollower: !!isFollower
+                };
+            })
+        );
+
+        res.render("amigos", { fotoPerfil, Users });
+    } catch (err) {
+        console.log(err);
+        res.render('status404', { mensagem404: 'Erro ao carregar essa página', fotoPerfil });
+    }
+});
 
 
 router.get("/perfil/:iduser", authenticate, async (req, res) => {
@@ -502,9 +545,9 @@ router.get("/", authenticate, async (req, res) => {
     }
 });
 
-router.post("/seguir/:idpost", authenticate, async (req, res) => {
+router.post("/seguir/:iduser", authenticate, async (req, res) => {
     try {
-        const iduser = req.params.idpost
+        const iduser = req.params.iduser
         const user1 = await userModel.findOne({ where: { iduser: iduser } })
         const user2 = await userModel.findOne({ where: { iduser: req.session.user.id } })
 
