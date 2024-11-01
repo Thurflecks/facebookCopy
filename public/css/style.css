@@ -604,3 +604,32 @@ body {
 .flex{
     flex-grow: 1
 }
+.noti{
+    display: flex;
+    font-family: JetBrains;
+}
+
+.noti a{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+    font-weight: 400;
+    text-decoration: none;
+    border-bottom: 1px solid rgb(203, 210, 217);
+    padding: 10px;
+    color: black;
+    font-family: JetBrains;
+}
+.noti img{
+    width: 40px;
+    height: 40px;
+}
+.aviso{
+    text-align: center;
+    margin-top: 100px;
+    font-family: JetBrains;
+    font-size: 20px;
+    font-weight: 600;
+}

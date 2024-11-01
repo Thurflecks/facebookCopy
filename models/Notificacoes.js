@@ -2,7 +2,7 @@ const { Sequelize, sequelize } = require("./Bd");
 
 
 const notificacoes = sequelize.define("notificacoes", {
-    idlike: {
+    idnoti: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
@@ -11,10 +11,30 @@ const notificacoes = sequelize.define("notificacoes", {
         type: Sequelize.INTEGER,
         allowNull: false
     },
+    idfollower: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    idpost: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    idseguir: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
+    idcomment: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
     conteudo: {
         type: Sequelize.STRING,
-        allowNull: true
-    }   
+        allowNull: false
+    },
+    tipo: {
+        type: Sequelize.STRING,
+        allowNull: false
+    }      
 }, {
     tableName: 'notificacoes',
     timestamps: false

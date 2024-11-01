@@ -227,6 +227,7 @@ router.post("/enviarCurtida/:idpost", authenticate, async (req, res) => {
     })
     const id = req.params.idpost
     const post = await postModel.findOne({ where: { idpost: id } });
+    const user = await userModel.findOne({ where: { iduser: post.iduser } })
     try {
         const existingLike = await likeModel.findOne({
             where: {
@@ -246,6 +247,8 @@ router.post("/enviarCurtida/:idpost", authenticate, async (req, res) => {
             }, {
                 where: { idpost: id }
             })
+            await notificacoesModel.destroy({ where: { idpost: id } })
+
             res.redirect(req.get('Referer'))
         } else {
             await likeModel.create({
@@ -257,6 +260,16 @@ router.post("/enviarCurtida/:idpost", authenticate, async (req, res) => {
                 likes: post.likes += 1
             }, {
                 where: { idpost: id }
+            })
+
+            await notificacoesModel.create({
+                iduser: req.session.user.id,
+                idfollower: user.iduser,
+                idpost: id,
+                idseguir: 0,
+                idcomment: 0,
+                conteudo: "curtiu sua publicação",
+                tipo: "https://i0.wp.com/www.multarte.com.br/wp-content/uploads/2018/10/coracao-png2.png?w=696&ssl=1"
             })
             res.redirect(req.get('Referer'))
         }
@@ -323,10 +336,84 @@ router.get("/notificacoes", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
     })
-
-    res.render("notificacoes", { fotoPerfil })
+    try {
+        const noti = await notificacoesModel.findAll({
+            where: {
+                idfollower: req.session.user.id,
+                iduser: { [Op.ne]: req.session.user.id }
+            }
+        })
+        const Notificacoes = await Promise.all(
+            noti.map(async notificacao => {
+                const user = await userModel.findOne({ where: { iduser: notificacao.iduser } })
+                return {
+                    ...notificacao.dataValues,
+                    conteudo: notificacao.conteudo,
+                    nomeUser: user.nome,
+                    id: user.iduser,
+                    tipo: notificacao.tipo
+                };
+            })
+        );
+        if (Notificacoes.length === 0){
+            return res.render("notificacoes", { fotoPerfil, aviso: "<p class='aviso'>Nenhuma Notificação!!!</p>" })
+        }
+        res.render("notificacoes", { fotoPerfil, Notificacoes })
+    } catch (err) {
+        console.log(err)
+        res.render("status404", { fotoPerfil, mensagem404: "Erro ao exibir a página de comentários" })
+    }
 })
 
+router.get("/deletarNoti/:idnoti", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
+    try {
+        const idnoti = await req.params.idnoti
+        console.log(idnoti)
+        await notificacoesModel.destroy({where:{idnoti: idnoti}})
+        res.redirect("/notificacoes")
+    } catch (err) {
+        console.log(err)
+        res.render("status404", {fotoPerfil, mensagem404: "Erro ao apagar notificação"})
+    }
+})
+router.get("/post/:idpost", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
+    try {
+        const idpost = req.params.idpost
+        const posts = await postModel.findAll({ where: { idpost: idpost } });
+
+        const postsAjeitados = await Promise.all(posts.map(async (post) => {
+            let user = await userModel.findByPk(post.iduser);
+            const imagemBase64 = post.imagem ? post.imagem.toString('base64') : null;
+            let fotoPerfilBase64 = user.foto_perfil ? Buffer.from(user.foto_perfil).toString('base64') : null;
+
+            const liked = await likeModel.findOne({
+                where: {
+                    idpost: post.idpost,
+                    iduser: req.session.user.id
+                }
+            });
+
+            return {
+                ...post.dataValues,
+                username: user.nome.toLowerCase(),
+                foto_perfil: fotoPerfilBase64,
+                imagem: imagemBase64,
+                isLiked: !!liked
+            };
+        }));
+        res.render("post", { fotoPerfil, postsAjeitados })
+
+    } catch (err) {
+        console.log(err)
+        res.render("status404", { fotoPerfil, mensagem404: "Erro ao exibir este post" })
+    }
+})
 router.get("/editPost/:idpost", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
@@ -405,6 +492,9 @@ router.get("/amigos", authenticate, async (req, res) => {
                 };
             })
         );
+        if (Users.length === 0){
+            return res.render("amigos", { fotoPerfil, aviso: "<p class='aviso'>Nenhuma Notificação!!!</p>" })
+        }
 
         res.render("amigos", { fotoPerfil, Users });
     } catch (err) {
@@ -419,7 +509,7 @@ router.post("/amigos/search", authenticate, async (req, res) => {
 
     try {
 
-        const {nome} = req.body
+        const { nome } = req.body
 
         const usuarios = await userModel.findAll({
             where: {
@@ -578,6 +668,7 @@ router.post("/seguir/:iduser", authenticate, async (req, res) => {
                     iduser: req.session.user.id
                 }
             })
+            await notificacoesModel.destroy({ where: { idseguir: iduser } })
             res.redirect(req.get("Referer"))
 
         } else {
@@ -598,6 +689,15 @@ router.post("/seguir/:iduser", authenticate, async (req, res) => {
                 where: {
                     iduser: req.session.user.id
                 }
+            })
+            await notificacoesModel.create({
+                iduser: req.session.user.id,
+                idfollower: iduser,
+                idpost: 0,
+                idcomment: 0,
+                idseguir: iduser,
+                conteudo: "começou a seguir você.",
+                tipo: "https://raw.githubusercontent.com/LudoVicenseStudio/assets/refs/heads/main/icons/user-png-icon-add-user-icons-512.png"
             })
             res.redirect(req.get("Referer"))
         }

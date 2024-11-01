@@ -1,13 +1,13 @@
 <div class="div-pai">
     <div>
-        <nav class="navFeed">
+        <nav class="navFeed fixed">
             <div>
                 <a href="/" class="tituloface">facebookCopy</a>
             </div>
         </nav>
-        <nav class="navIcons">
+        <nav class="navIcons fixed">
             <div>
-                <a href="/"><i class='bx bx-home-alt'></i></a>
+                <a href="/"><i class='bx bx-home-alt pageActive'></i></a>
                 <a href="/amigos"><i class='bx bx-user-plus'></i></a>
                 <a href="/newpost"><svg aria-label="Página inicial" class="x1lliihq x1n2onr6 x5n08af"
                         fill="currentColor" height="25" role="img" viewBox="0 0 24 24" width="25">
@@ -21,32 +21,34 @@
                         <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="2" x1="12.003" x2="12.003" y1="6.545" y2="17.455"></line>
                     </svg></a>
-                <a href="/notificacoes"><i class='bx bx-bell pageActive'></i></a>
+                <a href="/notificacoes"><i class='bx bx-bell'></i></a>
                 <a href="/minhaConta"><img class="minhaContaNav" src="data:image/png;base64,{{fotoPerfil}}"
                         alt="fot perfil"></a>
             </div>
         </nav>
         <div>
-            {{{aviso}}}
-            {{#each Notificacoes}}
-            {{#if idpost}}
-            <div class="noti">
-                <a href="/post/{{idpost}}">
-                    <img src="{{{tipo}}}" alt="NotiImg">
-                    <p>{{nomeUser}} {{conteudo}}</p>
-                    <a href="/deletarNoti/{{idnoti}}"><i class='bx bxs-trash-alt' ></i></a>
+            {{#each postsAjeitados}}
+            <div class="post">
+                <a href="{{#if (eq iduser ../userId)}}/minhaConta{{else}}/perfil/{{iduser}}{{/if}}" class="nomeperfil">
+                    <img class="fotoPerfil" src="data:image/png;base64,{{foto_perfil}}" alt="fot perfil">
+                    <p>{{username}}</p>
                 </a>
-                
+                <img class="imagemPost" src="data:image/png;base64,{{imagem}}" alt="conteudo post">
+                <div class="div-actions">
+                    <form action="/enviarCurtida/{{idpost}}" class="likes" method="post">
+                        <button>
+                            <i class='bx bx-heart btn-actions like-button {{#if isLiked}}liked bxs-heart{{/if}}'></i>
+                        </button>
+                    </form>
+                    <span>{{likes}}</span>
+                    <a href="/addComment/{{idpost}}"><i class='bx bx-comment comment'></i></a>
+                    <span>{{comments}}</span>
+                </div>
+                <div class="content-inline">
+                    <h2>{{username}}</h2>
+                    <p>{{legenda}}</p>
+                </div>
             </div>
-            {{else}}
-            <div class="noti">
-                <a href="/perfil/{{id}}">
-                    <img src="{{{tipo}}}" alt="NotiImg">
-                    <p>{{nomeUser}} {{conteudo}}</p>
-                    <a href="/deletarNoti/{{idnoti}}"><i class='bx bxs-trash-alt' ></i></a>
-                </a>
-            </div>
-            {{/if}}
             {{/each}}
         </div>
     </div>
