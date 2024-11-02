@@ -318,6 +318,15 @@ router.post("/enviarComment/:idpost", authenticate, async (req, res) => {
             iduser: req.session.user.id,
             comment: comentario
         });
+        await notificacoesModel.create({
+            iduser: req.session.user.id,
+            idfollower: post.iduser,
+            idpost: idpost,
+            idseguir: 0,
+            idcomment: post.iduser,
+            conteudo: "comentou em sua foto",
+            tipo: "https://cdn.icon-icons.com/icons2/1946/PNG/512/1904663-bubble-chat-comment-communication-message-talk-text_122514.png"
+        })
         await postModel.update({
             comments: post.comments += 1
         }, {
