@@ -515,21 +515,14 @@ router.post("/amigos/search", authenticate, async (req, res) => {
     const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
         return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
     });
-
     try {
-
         const { nome } = req.body
-
         const usuarios = await userModel.findAll({
             where: {
                 iduser: { [Op.ne]: req.session.user.id },
                 nome: nome
             }
         });
-        if (!usuarios || usuarios.length === 0) {
-            return res.render("amigos", { fotoPerfil, Users: [], msg: "Nenhum usuário encontrado!" });
-        }
-
         const Users = await Promise.all(
             usuarios.map(async usuario => {
                 const isFollower = await followerModel.findOne({
@@ -547,7 +540,9 @@ router.post("/amigos/search", authenticate, async (req, res) => {
                 };
             })
         );
-
+        if (Users.length === 0) {
+            return res.render("amigos", { fotoPerfil, aviso: "<p class='aviso'>Nenhum User!!!</p>" });
+        }
         res.render("amigos", { fotoPerfil, Users });
     } catch (err) {
         console.log(err);
@@ -609,6 +604,9 @@ router.get("/perfil/:iduser", authenticate, async (req, res) => {
 
 
 router.get("/", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    });
     try {
         const posts = await postModel.findAll({ order: [['idpost', 'DESC']] });
 
@@ -632,10 +630,9 @@ router.get("/", authenticate, async (req, res) => {
                 isLiked: !!liked
             };
         }));
-
-        const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
-            return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
-        });
+        if (postsAjeitados.length === 0){
+            return res.render("feed", {fotoPerfil, userId: req.session.user.id, aviso: "<p class='aviso'>Nenhuma Postagem!!!</p>" })
+        }
 
         res.render("feed", { postsAjeitados, fotoPerfil, userId: req.session.user.id });
     } catch (erro) {
