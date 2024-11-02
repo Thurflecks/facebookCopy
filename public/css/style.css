@@ -44,6 +44,7 @@ body {
     border-radius: 12px;
     font-size: 16px;
     outline: none;
+    font-family: JetBrains;
 }
 
 .botaoLogin {
@@ -165,7 +166,6 @@ body {
     font-size: 20px;
     font-weight: bold;
 }
-
 .navIcons div {
     display: flex;
     font-size: 30px;
