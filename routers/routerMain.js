@@ -365,6 +365,7 @@ router.get("/notificacoes", authenticate, async (req, res) => {
             fotoPerfil, Notificacoes, id, apagar: `<div class="deletarNoti">
             <a href="/apagarNoti/${id}">Apagar todas as notificações <i class="bx bx-trash-alt"></i></a>
          </div>`})
+         
     } catch (err) {
         console.log(err)
         res.render("status404", { fotoPerfil, mensagem404: "Erro ao exibir a página de comentários" })
