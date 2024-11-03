@@ -9,15 +9,9 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const path = require("path")
 const fs = require("fs");
-const user = require("../models/User");
-const { where } = require("sequelize");
-const { styleText } = require("util");
-const { AsyncLocalStorage } = require("async_hooks");
 const likeModel = require("../models/Likes");
 const followerModel = require("../models/Follower")
-const post = require("../models/Post");
 const commentModel = require("../models/Comment");
-const { isFloat32Array } = require("util/types");
 const notificacoesModel = require("../models/Notificacoes");
 const { Op } = require('sequelize');
 
@@ -114,7 +108,6 @@ router.post("/newPost/enviando", authenticate, imagemPost, async (req, res) => {
     try {
         const conteudoPost = req.files['conteudoPost'] ? req.files['conteudoPost'][0] : null;
 
-        // Verifica se o conteúdo do post é uma imagem
         if (conteudoPost && !conteudoPost.mimetype.startsWith('image/')) {
             throw new Error("Apenas arquivos de imagem são permitidos.");
         }
@@ -364,10 +357,14 @@ router.get("/notificacoes", authenticate, async (req, res) => {
                 };
             })
         );
-        if (Notificacoes.length === 0){
+        const id = req.session.user.id
+        if (Notificacoes.length === 0) {
             return res.render("notificacoes", { fotoPerfil, aviso: "<p class='aviso'>Nenhuma Notificação!!!</p>" })
         }
-        res.render("notificacoes", { fotoPerfil, Notificacoes })
+        res.render("notificacoes", {
+            fotoPerfil, Notificacoes, id, apagar: `<div class="deletarNoti">
+            <a href="/apagarNoti/${id}">Apagar todas as notificações <i class="bx bx-trash-alt"></i></a>
+         </div>`})
     } catch (err) {
         console.log(err)
         res.render("status404", { fotoPerfil, mensagem404: "Erro ao exibir a página de comentários" })
@@ -381,11 +378,24 @@ router.get("/deletarNoti/:idnoti", authenticate, async (req, res) => {
     try {
         const idnoti = await req.params.idnoti
         console.log(idnoti)
-        await notificacoesModel.destroy({where:{idnoti: idnoti}})
+        await notificacoesModel.destroy({ where: { idnoti: idnoti } })
         res.redirect("/notificacoes")
     } catch (err) {
         console.log(err)
-        res.render("status404", {fotoPerfil, mensagem404: "Erro ao apagar notificação"})
+        res.render("status404", { fotoPerfil, mensagem404: "Erro ao apagar notificação" })
+    }
+})
+router.get("/apagarNoti/:idfollower", authenticate, async (req, res) => {
+    const fotoPerfil = await userModel.findByPk(req.session.user.id).then(item => {
+        return item.foto_perfil ? Buffer.from(item.foto_perfil).toString('base64') : null;
+    })
+    try {
+        const idfollower = req.params.idfollower
+        await notificacoesModel.destroy({ where: { idfollower: idfollower } })
+        res.redirect("/notificacoes")
+    } catch (err) {
+        console.log(err)
+        res.render("status404", { fotoPerfil, mensagem404: "Erro ao apagar as notificações" })
     }
 })
 router.get("/post/:idpost", authenticate, async (req, res) => {
@@ -501,8 +511,8 @@ router.get("/amigos", authenticate, async (req, res) => {
                 };
             })
         );
-        if (Users.length === 0){
-            return res.render("amigos", { fotoPerfil, aviso: "<p class='aviso'>Nenhuma Notificação!!!</p>" })
+        if (Users.length === 0) {
+            return res.render("amigos", { fotoPerfil, aviso: "<p class='aviso'>Nenhum User!!!</p>" })
         }
 
         res.render("amigos", { fotoPerfil, Users });
@@ -630,8 +640,8 @@ router.get("/", authenticate, async (req, res) => {
                 isLiked: !!liked
             };
         }));
-        if (postsAjeitados.length === 0){
-            return res.render("feed", {fotoPerfil, userId: req.session.user.id, aviso: "<p class='aviso'>Nenhuma Postagem!!!</p>" })
+        if (postsAjeitados.length === 0) {
+            return res.render("feed", { fotoPerfil, userId: req.session.user.id, aviso: "<p class='aviso'>Nenhuma Postagem!!!</p>" })
         }
 
         res.render("feed", { postsAjeitados, fotoPerfil, userId: req.session.user.id });

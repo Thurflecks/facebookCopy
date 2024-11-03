@@ -611,11 +611,10 @@ body {
 }
 
 .noti a{
-    display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 1rem;
-    justify-content: center;
+    justify-content:start;
     font-weight: 400;
     text-decoration: none;
     border-bottom: 1px solid rgb(203, 210, 217);
@@ -624,8 +623,8 @@ body {
     font-family: JetBrains;
 }
 .noti img{
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
 }
 .aviso{
     text-align: center;
@@ -636,4 +635,20 @@ body {
 }
 .deletar{
     justify-content: end;
+}
+.notiUser{
+    display: flex;
+    width: 100%;
+}
+.deletarNoti{
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid rgb(203, 210, 217);
+    width: 100%;
+    margin-top: 15px;
+    padding-bottom: 15px;
+}
+.deletarNoti a{
+    color:  rgb(196, 23, 23);
+    text-decoration: none;
 }

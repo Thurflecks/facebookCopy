@@ -28,10 +28,11 @@
         </nav>
         <div>
             {{{aviso}}}
+            {{{apagar}}}
             {{#each Notificacoes}}
             {{#if idpost}}
             <div class="noti">
-                <a href="/post/{{idpost}}">
+                <a href="/post/{{idpost}}" class="notiUser">
                     <img src="{{{tipo}}}" alt="NotiImg">
                     <p>{{nomeUser}} {{conteudo}}</p>
                     <a href="/deletarNoti/{{idnoti}}"><i class='bx bxs-trash-alt' ></i></a>
@@ -39,8 +40,8 @@
             </div>
             {{else}}
             <div class="noti">
-                <a href="/perfil/{{id}}">
-                    <img src="{{{tipo}}}" alt="NotiImg">
+                <a href="/perfil/{{id}}" class="notiUser" >
+                    <img src="{{{tipo}}}"alt="NotiImg">
                     <p>{{nomeUser}} {{conteudo}}</p>
                     <a href="/deletarNoti/{{idnoti}}"><i class='bx bxs-trash-alt' ></i></a>
                 </a>
