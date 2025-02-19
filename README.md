@@ -54,5 +54,5 @@ Para rodar o projeto localmente, siga os passos abaixo:
 
 ## Contribuindo
 
-Se você deseja contribuir com o projeto, fique à vontade para abrir issues ou pull requests no repositório GitHub.
+Se você deseja contribuir com o projeto, fique à vontade para abrir issues ou pull requests no repositório GitHub. Grande abraço!
 
