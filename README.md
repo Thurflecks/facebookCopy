@@ -4,7 +4,7 @@ FacebookCopy é uma aplicação web que replica algumas funcionalidades básicas
 
 ## Visite o site
 
-Você pode acessar o site aqui: [FacebookCopy](https://facebookcopy-production.up.railway.app/)
+Você pode acessar o site aqui: [FacebookCopy](https://facebookcopy-production.up.railway.app/) ** LINK NÃO FUNCIONAL **
 
 ## Funcionalidades
 
