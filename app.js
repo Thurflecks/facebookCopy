@@ -5,7 +5,7 @@ const router = require("./routers/routerMain.js")
 const { engine } = require("express-handlebars")
 const session = require("express-session")
 //porta
-const port = 16273
+const port = process.env.PORT || 8081;
 
 //config pastas de arquivos estaticos
 app.use(express.static(path.join(__dirname, "public")))
@@ -37,5 +37,5 @@ app.use(router)
 
 //escutando porta
 app.listen(port, () => {
-    console.log("site online em: http://localhost:8081")
+    console.log("site online")
 })
