@@ -5,7 +5,7 @@ const router = require("./routers/routerMain.js")
 const { engine } = require("express-handlebars")
 const session = require("express-session")
 //porta
-const port = process.env.PORT | 8081
+const port = 16273
 
 //config pastas de arquivos estaticos
 app.use(express.static(path.join(__dirname, "public")))
