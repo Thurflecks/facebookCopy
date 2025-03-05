@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Thurflecks/facebookCopy#readme",
   "dependencies": {
+    "nodemon": "3.1.9",
     "express": "^4.21.0",
     "express-handlebars": "^8.0.1",
     "express-session": "^1.18.0",
