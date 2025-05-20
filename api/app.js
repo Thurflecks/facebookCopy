@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const app = express();
-const router = require("./routers/routerMain.js");
+const router = require("../routers/routerMain.js");
 const { engine } = require("express-handlebars");
 const session = require("express-session");
 
