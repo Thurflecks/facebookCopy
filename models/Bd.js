@@ -1,17 +1,19 @@
-const { Sequelize } = require("sequelize")
+const { Sequelize } = require("sequelize");
+require("dotenv").config();
 
-const sequelize = new Sequelize("railway", "root", "yLCkTlmUozTZyPnbTeBzMQfYudBMkaKe", {
-    host: "centerbeam.proxy.rlwy.net",
-    dialect: "mysql",
-    port: 52236,
-})
+const sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    {
+        host: process.env.DB_HOST,
+        dialect: "mysql",
+        port: process.env.DB_PORT,
+    }
+);
 
-sequelize.authenticate().then(()=>
-console.log("banco de dados conectado")
-).catch((err)=>{
-    console.log(`deu erro arromabedi ${err}`)
-})
+sequelize.authenticate()
+    .then(() => console.log("Banco de dados conectado com sucesso!"))
+    .catch((err) => console.log(`Erro ao conectar: ${err.message}`));
 
-module.exports = {
-    Sequelize, sequelize
-}
+module.exports = { Sequelize, sequelize };

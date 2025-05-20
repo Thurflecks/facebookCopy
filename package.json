@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./api/app.js",
-    "dev": "nodemon ./api/app.js"
+    "dev": "nodemon ./api/app.js",
+    "build": "echo 'Nada para buildar'"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/Thurflecks/facebookCopy#readme",
   "dependencies": {
+    "dotenv": "^16.5.0",
     "express": "^4.21.0",
     "express-handlebars": "^8.0.1",
     "express-session": "^1.18.0",
