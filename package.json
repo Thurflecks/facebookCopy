@@ -4,13 +4,12 @@
   "description": "copia do facebook",
   "main": "app.js",
   "engines": {
-    "node": "22.x"
+    "node": "14.x"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./api/app.js",
-    "dev": "nodemon ./api/app.js",
-    "build": "echo 'Nada para buildar'"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -23,14 +22,12 @@
   },
   "homepage": "https://github.com/Thurflecks/facebookCopy#readme",
   "dependencies": {
-    "dotenv": "^16.5.0",
+    "nodemon": "3.1.9",
     "express": "^4.21.0",
     "express-handlebars": "^8.0.1",
     "express-session": "^1.18.0",
     "multer": "^1.4.5-lts.1",
-    "mysql2": "^3.14.1",
-    "nodemon": "3.1.9",
-    "sequelize": "^6.37.3",
-    "serverless-http": "^3.2.0"
+    "mysql2": "^3.11.3",
+    "sequelize": "^6.37.3"
   }
 }
