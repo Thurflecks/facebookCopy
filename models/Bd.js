@@ -1,9 +1,9 @@
 const { Sequelize } = require("sequelize")
 
-const sequelize = new Sequelize("railway", "root", "wiBxytCWeOgOOqTTkTecvXmQMCeXccFG", {
-    host: "shortline.proxy.rlwy.net",
+const sequelize = new Sequelize("railway", "root", "oMOOsLcnMHCVxhZwZcMKloXQvTpXNCbj", {
+    host: "mainline.proxy.rlwy.net",
     dialect: "mysql",
-    port: 51142,
+    port: 16272,
 })
 
 sequelize.authenticate().then(()=>
