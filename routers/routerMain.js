@@ -531,7 +531,9 @@ router.post("/amigos/search", authenticate, async (req, res) => {
         const usuarios = await userModel.findAll({
             where: {
                 iduser: { [Op.ne]: req.session.user.id },
-                nome: nome
+                nome: {
+                    [Op.like]: `%${nome}%`
+                }
             }
         });
         const Users = await Promise.all(
